@@ -64,8 +64,8 @@ Example Usage:
 
 sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -d output_name.dump
 
-Runs the svndumpfilter on the coconut.dump file from the repository, coconut_repo, to carve out the coconut directory
-and save the output to a commandline.dump file.
+Runs the svndumpfilter on 'input_name.dump' from 'repo_path' to carve out 'directory_name'
+and save the result to 'output_name.dump'.
 
 """
 
@@ -720,12 +720,12 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                   if check.is_included(node_seg.head[NODE_PATH]):  # Don't write if not in included path.
                     write_included(rev_map, node_seg, flags, opt)
           if not opt.drop_empty or len(flags['to_write']) > 1:
-            # Revision 0 can't have any associated node records.
             if flags['can_write']:
               write_segments(output_file, flags['to_write'])
             if opt.renumber_revs and not flags['did_increment']:
               flags['renum_rev'] += 1
-          if rev_seg and int(rev_seg.head[REV_NUM]) == 0:
+          if (opt.drop_empty or not flags['can_write']) and rev_seg and int(rev_seg.head[REV_NUM]) == 0:
+            # Revision 0 can't have any associated node records.
             write_segments(output_file, flags['to_write'])
             flags['renum_rev'] += 1
           flags['orig_rev'] += 1
