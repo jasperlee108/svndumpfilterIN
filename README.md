@@ -2,7 +2,7 @@ svndumpfilterIN
 ===============
 
 
-An implementation of Apache's svndumpfilter that solves some of common problems.
+An implementation of Apache's svndumpfilter that solves some common problems.
 
 
 ## Requirements ##
