@@ -96,8 +96,8 @@ necessary.
 
 To file issue reports, use the project's issue tracker on GitHub.
 
-When creating an issue, please provide a sample of the dump file that is creating the proglem or provide a method to
-reproduce the problem.
+When creating an issue, please provide a sample of the dump file that is creating the problem or provide a method to
+reproduce it.
 
 Patches are also welcome to the problems you encounter.
 
