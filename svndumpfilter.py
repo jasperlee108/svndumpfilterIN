@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
+import argparse
 import os
 import re
 import subprocess
@@ -335,6 +335,7 @@ class MatchFiles(object):
     """
     if path[-1] == '/':  # Takes care of the case when you have dir1/dir2/dir3/ as input
       path = path[:-1]
+    #print 'match: ' + path
     path_comps = self._extract_path(path)
     curr = self.matches  # The level of the directory hierarchy you are on.
     for idx, comp in enumerate(path_comps):
@@ -560,8 +561,12 @@ def create_matcher(include, matches, opt):
   provided by a file.
   """
   matcher = MatchFiles(include)
-  for match in matches:
-    matcher.add_to_matches(match)
+  if matches:
+    if matches.__class__.__name__ == 'str':
+      matcher.add_to_matches(matches)
+    else: 
+      for match in matches:
+        matcher.add_to_matches(match)
   if opt.file:
     matcher.read_matches_from_file(opt.file)
   return matcher
@@ -684,8 +689,8 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
   check = create_matcher(include, matches, opt)
   clean_up(output_dump)
 
-  with open(input_dump) as input_file:
-    with open(output_dump, 'a+') as output_file:
+  with open(input_dump, 'rb') as input_file:
+    with open(output_dump, 'ab+') as output_file:
       write_dump_header(input_file, output_file, opt)
       try:
         while 1:
@@ -738,66 +743,61 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
 def main():
 
-  parser = OptionParser(
-          usage='%prog [OPTIONS] <input_dump> <SUBCOMMAND> [args]',
-          version='%prog 1.1')
+  parser = argparse.ArgumentParser(description='Filter Subversion Dump files.')
 
-  parser.add_option('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
+  parser.add_argument('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
                   help='If filtering causes any revision to be empty (i.e. has no node records in that revision), \
                   still keep the revision in the final dump file.')
 
-  parser.add_option('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
+  parser.add_argument('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
                   help="Don't revisions that remain after filtering.")
 
-  parser.add_option('-q', '--quiet', dest='quiet', action='store_true', default=False,
+  parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', default=False,
                   help='Does not display filtering statistics.')
 
-  parser.add_option('-n', '--revisions', dest='start_revision',
+  parser.add_argument('-n', '--revisions', dest='start_revision',
                   help='Starts filtering at a specified revision and ends at the last revision in the input dump file.')
 
-  parser.add_option('-c', '--scan-only', dest='scan', action='store_true', default=False,
+  parser.add_argument('-c', '--scan-only', dest='scan', action='store_true', default=False,
                   help='Scans the dumpfile to see if untangling is necessary.')
 
-  parser.add_option('-f', '--paths-file', dest='file',
+  parser.add_argument('-f', '--paths-file', dest='file',
                   help='Specifies the file to read matched paths from.')
 
-  parser.add_option('-r', '--repo', dest='repo',
+  parser.add_argument('-r', '--repo', dest='repo',
                   help='Specify a repository. This is mandatory when not scanning.')
 
-  parser.add_option('-d', '--debug', dest='debug', action='store_true', default=False,
+  parser.add_argument('-d', '--debug', dest='debug', action='store_true', default=False,
                   help='Turns on debug statements.')
 
-  parser.add_option('-o', '--output-dump', dest='output_dump',
+  parser.add_argument('-o', '--output-dump', dest='output_dump',
                   help='Specify an output dump file. This is mandatory when not scanning')
 
-  (opt, args) = parser.parse_args()
+  parser.add_argument('input_dump',
+                  help='Specify an input dump file. This is mandatory')
+ 
+  parser.add_argument('subcommand',
+                  help='Specify the subcommand (include or exclude). This is mandatory')
 
-  if not opt.file:
-    if len(args) < 3:
-      parser.error('You must specify a input_dump, a sub-command, and arguments.')
-  else:
-    if len(args) < 2:
-      parser.error('When specifying a file, you must provide an input_dump and a sub-command')
+  parser.add_argument('matches', nargs='?',
+                  help='Specifies what pattern to match. This is mandatory if not specifying a match file')
 
+  opt  = parser.parse_args()
+  
   if not opt.scan:
     if not opt.repo:
         parser.error("When not scanning, you must specify a path to the dump file's repository.")
     elif not opt.output_dump:
         parser.error('When not scanning, you must specify a path to the output dump file.')
 
-  input_dump = args[0]
-  subcommand = args[1]
-
-  if subcommand == 'include':
+  if opt.subcommand == 'include':
     include = True
-  elif subcommand == 'exclude':
+  elif opt.subcommand == 'exclude':
     include = False
   else:
     parser.error("Unrecognized subcommand : Must use either 'include' or 'exclude'")
 
-  matches = args[2:]
-
-  parse_dump(input_dump, opt.output_dump, matches, include, opt)
+  parse_dump(opt.input_dump, opt.output_dump, opt.matches, include, opt)
 
 
 if __name__ == '__main__':
