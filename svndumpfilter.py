@@ -52,7 +52,7 @@ Optimizations / Improvements
        Example: You can now add --file to specify a file to read matched paths from.
 
   9.  Property tags are added to differentiate dump filter generated items.
-       Example: For the property header, a key, "K 23" as "svndumpfilter generated", is appended with a value, "V 4"
+       Example: For the property header, a key, "K 23" as "svndumpfilter:generated", is appended with a value, "V 4"
        as "True".
 
 
@@ -457,7 +457,7 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
 def create_node_record(file_path, kind, body=None):
   """
   Creates a node record for directories to add in excluded items. The node record will
-  contain a header with a key of 'svndumpfilter generated' and a value of 'True'.
+  contain a header with a key of 'svndumpfilter:generated' and a value of 'True'.
   """
   node_rec = Record()
   node_rec.type = 'Node'
@@ -468,7 +468,7 @@ def create_node_record(file_path, kind, body=None):
   node_rec.order_head = header
   node_rec.head = dict(node_rec.order_head)
   # Number on KV header line displays length of KV content without newline character.
-  node_rec.order_prop = [('K 23\n', 'svndumpfilter generated\n'), ('V 4\n', 'True\n')]
+  node_rec.order_prop = [('K 23\n', 'svndumpfilter:generated\n'), ('V 4\n', 'True\n')]
   return node_rec
 
 
