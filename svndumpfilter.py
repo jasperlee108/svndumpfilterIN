@@ -233,7 +233,7 @@ class Record(object):
 
     line = d_file.readline()
     while line != '\n':
-      key, value = line.split(': ')
+      key, value = line.split(': ', 1)
       clean_val = value.rstrip('\n')
       self._add_header(key, clean_val)
       line = d_file.readline()
