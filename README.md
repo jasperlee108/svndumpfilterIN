@@ -21,13 +21,13 @@ svndumpfilterIN was developed on a Linux machine using
 target directory.
 
 
-    svndumpfilter output_file [subcommand] [<options>]
+    Usage: svndumpfilter.py [OPTIONS] <input_dump> <SUBCOMMAND> [args]
 
 
 
 Example Usage:
 
-    sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -d output_name.dump
+    sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
 
 Runs the svndumpfilter on `input_name.dump` from `repo_path` to carve out `directory_name`
 and save the result to `output_name.dump`.
