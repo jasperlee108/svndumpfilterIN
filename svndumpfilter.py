@@ -684,8 +684,8 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
   check = create_matcher(include, matches, opt)
   clean_up(output_dump)
 
-  with open(input_dump) as input_file:
-    with open(output_dump, 'a+') as output_file:
+  with open(input_dump, 'rb') as input_file:
+    with open(output_dump, 'a+b') as output_file:
       write_dump_header(input_file, output_file, opt)
       try:
         while 1:
