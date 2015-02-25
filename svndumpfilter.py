@@ -87,7 +87,7 @@ NODE_ACTION = 'Node-action'
 NODE_COPYFROM_PATH = 'Node-copyfrom-path'
 NODE_COPYFROM_REV = 'Node-copyfrom-rev'
 PROP_END = 'PROPS-END'
-
+SVN_MERGEINFO = 'svn:mergeinfo\n'
 
 def write_empty_lines(d_file, number=1):
     """
@@ -302,10 +302,14 @@ class Record(object):
         Remove a pre-existing header if it shares the same key.
         """
         self.head[key] = value
-        for prop in self.order_head:
+        insert = True 
+        for i, prop in enumerate(self.order_head):
             if prop[0] == key:
-                self.order_head.remove((prop[0], prop[1]))
-        self.order_head.insert(0, (key, value))
+                self.order_head[i] = (prop[0], value)
+                insert = False
+                break
+        if insert == True:
+            self.order_head.insert(0, (key, value))
 
     def __repr__(self):
         original = super(Record, self).__repr__()
@@ -556,6 +560,22 @@ def handle_deleting_directory(d_file, file_path):
     node_rec.write_segment(d_file)
 
 
+def update_prop_len(node_seg):
+    """
+    Calculate length of node properties
+    """
+    length = len(PROP_END) + 1
+    for i in node_seg.order_prop:
+        for k in i:
+            length += len(k)
+
+    node_seg.update_head(PROP_CONTENT_LEN, length)
+    if TEXT_CONTENT_LEN in node_seg.head:
+        node_seg.update_head(CONTENT_LEN, (int(node_seg.head[TEXT_CONTENT_LEN]) + length))
+    else:
+        node_seg.update_head(CONTENT_LEN, length)
+
+
 class FinishedFiltering(Exception):
 
     """
@@ -729,6 +749,14 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                         else:
                             if flags['can_write']:
                                 if check.is_included(node_seg.head[NODE_PATH]):
+                                    if opt.strip_merge:
+                                        to_strip = [i for i, v in enumerate(node_seg.order_prop) if v[1] == SVN_MERGEINFO]
+                                        for i in sorted(to_strip, reverse=True):
+                                            print 'Stripping property: %s' % (SVN_MERGEINFO.rstrip()) 
+                                            # Strip key and value
+                                            del node_seg.order_prop[i:i+2]
+                                            # Recalculate Text and Prop content-length
+                                            update_prop_len(node_seg)
                                     if NODE_COPYFROM_REV in node_seg.head:
                                         if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision)) or (
                                                 NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
@@ -782,6 +810,9 @@ def main():
 
     parser.add_option('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
                       help="Don't revisions that remain after filtering.")
+
+    parser.add_option('-x', '--strip-mergeinfo', dest='strip_merge', action='store_true', default=False,
+                      help="Remove svn:mergeinfo properties.")
 
     parser.add_option('-q', '--quiet', dest='quiet', action='store_true', default=False,
                       help='Does not display filtering statistics.')
