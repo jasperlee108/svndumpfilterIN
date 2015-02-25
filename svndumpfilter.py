@@ -723,7 +723,10 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
     rev_map = {}  # Stores the mappings for revisions when renumbering { 'original revision': 'renumbered revision' }
     empty_revs = set()  # Stores dropped revisions numbers
     check = create_matcher(include, matches, opt)
-    clean_up(output_dump)
+    if not opt.scan:
+        clean_up(output_dump)
+    else:
+        output_dump = os.devnull
 
     with open(input_dump, 'rb') as input_file:
         with open(output_dump, 'a+b') as output_file:
