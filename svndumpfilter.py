@@ -809,7 +809,7 @@ def main():
                   still keep the revision in the final dump file.')
 
     parser.add_option('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
-                      help="Don't revisions that remain after filtering.")
+                      help="Don't renumber revisions that remain after filtering.")
 
     parser.add_option('-x', '--strip-mergeinfo', dest='strip_merge', action='store_true', default=False,
                       help="Remove svn:mergeinfo properties.")
