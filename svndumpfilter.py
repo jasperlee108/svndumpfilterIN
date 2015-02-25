@@ -79,6 +79,8 @@ REV_NUM = 'Revision-number'
 CONTENT_LEN = 'Content-length'
 PROP_CONTENT_LEN = 'Prop-content-length'
 TEXT_CONTENT_LEN = 'Text-content-length'
+TEXT_COPY_SOURCE_MD5 = 'Text-copy-source-md5'
+TEXT_COPY_SOURCE_SHA1 = 'Text-copy-source-sha1'
 NODE_PATH = 'Node-path'
 NODE_KIND = 'Node-kind'
 NODE_ACTION = 'Node-action'
@@ -699,6 +701,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
     print "Starting to filter dumpfile : %s " % input_dump
     rev_map = {}  # Stores the mappings for revisions when renumbering { 'original revision': 'renumbered revision' }
+    empty_revs = set()  # Stores dropped revisions numbers
     check = create_matcher(include, matches, opt)
     clean_up(output_dump)
 
@@ -725,18 +728,31 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                             break  # Finished processing node records and should now look at revision records.
                         else:
                             if flags['can_write']:
-                                if (NODE_COPYFROM_PATH in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH])
-                                        and check.is_included(node_seg.head[NODE_PATH])):
-                                    # Moving file from excluded to included
-                                    handle_exclude_to_include(node_seg, output_file, flags, opt)
-                                elif (NODE_COPYFROM_PATH in node_seg.head and
-                                      check.is_included(node_seg.head[NODE_COPYFROM_PATH]) and
-                                      not check.is_included(node_seg.head[NODE_PATH])):
-                                    # Moving a file from included to excluded should be a delete
-                                    handle_include_to_exclude(output_file, flags, opt)
-                                else:
-                                    if check.is_included(node_seg.head[NODE_PATH]):  # Don't write if not in included path.
+                                if check.is_included(node_seg.head[NODE_PATH]):
+                                    if NODE_COPYFROM_REV in node_seg.head:
+                                        if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision)) or (
+                                                NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
+                                            if TEXT_CONTENT_LEN in node_seg.head:
+                                                print '%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN)
+                                                print 'Stripping: %s' % (NODE_COPYFROM_REV) 
+                                                node_seg.order_head.remove((NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
+                                                print 'Stripping: %s' % (NODE_COPYFROM_PATH) 
+                                                node_seg.order_head.remove((NODE_COPYFROM_PATH, node_seg.head[NODE_COPYFROM_PATH]))
+                                                if TEXT_COPY_SOURCE_MD5 in node_seg.head:
+                                                    node_seg.order_head.remove((TEXT_COPY_SOURCE_MD5, node_seg.head[TEXT_COPY_SOURCE_MD5]))
+                                                if TEXT_COPY_SOURCE_SHA1 in node_seg.head:
+                                                    node_seg.order_head.remove((TEXT_COPY_SOURCE_SHA1, node_seg.head[TEXT_COPY_SOURCE_SHA1]))
+                                                write_included(rev_map, node_seg, flags, opt)
+                                            else:
+                                                print '%s: %s is in skipped revisions, trying to untangle' % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV])
+                                                handle_exclude_to_include(node_seg, output_file, flags, opt)
+                                        else:
+                                            write_included(rev_map, node_seg, flags, opt)
+                                    else:
                                         write_included(rev_map, node_seg, flags, opt)
+                    if flags['can_write'] and not len(flags['to_write']) > 1:  # Adding revision to skipped revs set
+                        print 'Adding revision %s to the skipped revisions list' % (flags['orig_rev'])  # [!!!]
+                        empty_revs.add(flags['orig_rev'])
                     if not opt.drop_empty or len(flags['to_write']) > 1:
                         if flags['can_write']:
                             write_segments(output_file, flags['to_write'])
