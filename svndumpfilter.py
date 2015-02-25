@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from optparse import OptionParser
+from tempfile import TemporaryFile
 import os
 import re
 import subprocess
@@ -417,12 +418,19 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
         command_list.extend(['-r', rev_num, command, repo_path, file_path])
         if debug:
             print command_list
-    process = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = process.communicate()
-    if err:
-        raise SVNLookError(err)
-    else:
-        return out
+    with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
+        process = subprocess.Popen(command_list, stdout = stdout_temp_file, stderr = stderr_temp_file)
+        exit_code = process.wait()
+        if exit_code:
+            stderr_temp_file.flush()
+            stderr_temp_file.seek(0)
+            error_msg = stderr_temp_file.read()
+            raise SVNLookError(error_msg)
+        else:
+            stdout_temp_file.flush()
+            stdout_temp_file.seek(0)
+            out = stdout_temp_file.read()
+            return out
 
 
 def handle_missing_file(d_file, from_path, destination, rev_num, repo_path, debug):
