@@ -60,12 +60,12 @@ necessary.
   You will need to untangle this by retrieving information about the file that you are copying from and add
   it to a prior node record.
 
-4. Ability to strip svn:mergeinfo properties.
+4. Ability to strip `svn:mergeinfo` properties.
 
-  Example: You can strip svn:mergeinfo properties. Svnadmin tries to resolve merge info from 'svn:mergeinfo' properties,
+  Example: You can strip svn:mergeinfo properties. Svnadmin tries to resolve merge info from `svn:mergeinfo` properties,
   and in case of heavy filtering they are broken because of the dropped revisions. Such dumps cause svnadmin to fail import. 
 
-Arguments: '-x', '--strip-mergeinfo'.
+  Arguments: `-x`, `--strip-mergeinfo`.
 
 5. Ability to start filtering at any revision.
 
