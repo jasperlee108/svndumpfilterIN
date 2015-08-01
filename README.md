@@ -32,6 +32,7 @@ Example Usage:
 Runs the svndumpfilter on `input_name.dump` from `repo_path` to carve out `directory_name`
 and save the result to `output_name.dump`.
 
+See also `python svndumpfilter.py --help`.
 
 ## Implementation ##
 
