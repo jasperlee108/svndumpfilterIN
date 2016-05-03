@@ -761,8 +761,9 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                             # Recalculate Text and Prop content-length
                                             update_prop_len(node_seg)
                                     if NODE_COPYFROM_REV in node_seg.head:
-                                        if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision)) or (
-                                                NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
+                                        if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or
+                                        	(opt.start_revision and int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision))) or
+                                        	(NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
                                             if TEXT_CONTENT_LEN in node_seg.head:
                                                 print '%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN)
                                                 print 'Stripping: %s' % (NODE_COPYFROM_REV) 
