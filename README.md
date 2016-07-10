@@ -61,17 +61,24 @@ necessary.
   You will need to untangle this by retrieving information about the file that you are copying from and add
   it to a prior node record.
 
-4. Ability to start filtering at any revision.
+4. Ability to strip `svn:mergeinfo` properties.
+
+  Example: You can strip svn:mergeinfo properties. Svnadmin tries to resolve merge info from `svn:mergeinfo` properties,
+  and in case of heavy filtering they are broken because of the dropped revisions. Such dumps cause svnadmin to fail import. 
+
+  Arguments: `-x`, `--strip-mergeinfo`.
+
+5. Ability to start filtering at any revision.
 
   Example: You can start filtering at revision 100 if you have already loaded the first 100 previously from
   another dump file.
 
-5. Automatically untangles revisions.
+6. Automatically untangles revisions.
 
   Example: Whenever you reference an excluded path from an included node-path, you will automatically have the
   excluded data loaded in a prior record.
 
-6. Path matching is done on more than just the top-level.
+7. Path matching is done on more than just the top-level.
  
   Example: You can match to `repo/dir1/dir2` which is more than the `repo/dir1/` which is as deep as some filters
   can match to.
@@ -82,11 +89,11 @@ necessary.
   level deep. For example, if you only include `repo/dir1`, you will need to have a node add `repo` before the
   node record that adds `repo/dir1`.
 
-8. Paths to include/exclude can now be read from a file.
+9. Paths to include/exclude can now be read from a file.
 
   Example: You can now add `--file` to specify a file to read matched paths from.
 
-9. Property tags are added to differentiate dump filter generated items.
+10. Property tags are added to differentiate dump filter generated items.
 
   Example: For the property header, a key, `K 23` as `svndumpfilter generated`, is appended with a value, `V 4`
   as `True`.
