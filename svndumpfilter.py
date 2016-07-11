@@ -407,7 +407,7 @@ class MatchFiles(object):
         if self.debug:
             if self.include:
                  verb = 'including'
-            else
+            else:
                  verb = 'excluding'
             print 'Checking path {0} - {1} result'.format(path, verb)
         if self.include:
