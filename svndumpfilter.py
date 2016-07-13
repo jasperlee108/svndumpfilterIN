@@ -534,6 +534,7 @@ def add_dependents(to_write, matches):
     for dir_path in dir_to_add:
         node_rec = create_node_record(dir_path[:-1], 'dir')
         to_write.append(node_rec)
+    return len(dir_to_add) > 0
 
 
 def handle_deleting_file(d_file, file_path):
@@ -644,7 +645,8 @@ def process_revision_record(rev_map, include, check, flags, opt):
     flags['to_write'].append(rev_seg)
     rev_map[str(flags['orig_rev'])] = str(flags['renum_rev'])
     if include and int(rev_seg.head[REV_NUM]) == 1:  # Revision 0 can't contain Node Records
-        add_dependents(flags['to_write'], check.matches)
+        if add_dependents(flags['to_write'], check.matches):
+            flags['included'] = True
     return rev_seg
 
 
@@ -664,6 +666,7 @@ def handle_exclude_to_include(node_seg, output_file, flags, opt):
         flags['renum_rev'] += 1
         flags['did_increment'] = True
     flags['to_write'] = []  # Need to write items in queue because we know that this revision won't be empty
+    flags['included'] = False
     if node_seg.head[NODE_KIND] == 'file':
         handle_missing_file(output_file, node_seg.head[NODE_COPYFROM_PATH], node_seg.head[NODE_PATH],
                             node_seg.head[NODE_COPYFROM_REV], opt.repo, opt.debug)
@@ -682,6 +685,7 @@ def handle_include_to_exclude(output_file, flags, opt):
         flags['renum_rev'] += 1
         flags['did_increment'] = True
     flags['to_write'] = []
+    flags['included'] = False
 
 
 def write_included(rev_map, node_seg, flags, opt):
@@ -697,6 +701,7 @@ def write_included(rev_map, node_seg, flags, opt):
                 new_copy_rev = str(int(new_copy_rev) - 1)
             node_seg.update_head(NODE_COPYFROM_REV, new_copy_rev)
     flags['to_write'].append(node_seg)
+    flags['included'] = True
 
 
 def parse_dump(input_dump, output_dump, matches, include, opt):
@@ -717,6 +722,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
         'next_rev': None,  # Stores an extracted revision record
         'did_increment': None,  # Prevents multiple increments for 1 revision
         'to_write': [],  # List of items to write
+        'included': False, # items must be written if to_write is not empty because the rev_seg item was already written and removed
     }
 
     print "Starting to filter dumpfile : %s " % input_dump
@@ -736,6 +742,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                     if not opt.quiet:
                         print '---- Working on Input Revision %s (Renumber Rev: %s) ----' % (flags['orig_rev'], flags['renum_rev'])
                     flags['to_write'] = []
+                    flags['included'] = False
                     if not flags['next_rev']:  # This is the first revision (rev 0).
                         rev_seg = Record()
                         rev_seg.extract_segment(input_file)
@@ -782,10 +789,10 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                             write_included(rev_map, node_seg, flags, opt)
                                     else:
                                         write_included(rev_map, node_seg, flags, opt)
-                    if flags['can_write'] and not len(flags['to_write']) > 1:  # Adding revision to skipped revs set
+                    if flags['can_write'] and not flags['included']:  # Adding revision to skipped revs set
                         print 'Adding revision %s to the skipped revisions list' % (flags['orig_rev'])  # [!!!]
                         empty_revs.add(flags['orig_rev'])
-                    if not opt.drop_empty or len(flags['to_write']) > 1:
+                    if not opt.drop_empty or flags['included']:
                         if flags['can_write']:
                             write_segments(output_file, flags['to_write'])
                         if opt.renumber_revs and not flags['did_increment']:
