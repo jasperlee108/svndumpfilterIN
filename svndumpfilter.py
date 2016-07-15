@@ -3,6 +3,7 @@
 from optparse import OptionParser
 from tempfile import TemporaryFile
 import os
+import pprint
 import re
 import subprocess
 import sys
@@ -63,7 +64,7 @@ target directory.
 
 Example Usage:
 
-sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -d output_name.dump
+sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
 
 Runs the svndumpfilter on 'input_name.dump' from 'repo_path' to carve out 'directory_name'
 and save the result to 'output_name.dump'.
@@ -73,6 +74,7 @@ and save the result to 'output_name.dump'.
 """The number of bytes taken by the entire self-generated property section."""
 PROPERTY_BYTES = 48
 
+VALID_DUMP_FORMAT_VERSIONS = [2, 3]
 DUMP_FORMAT_VERSION = 'SVN-fs-dump-format-version'
 DUMP_UUID = 'UUID'
 REV_NUM = 'Revision-number'
@@ -81,6 +83,9 @@ PROP_CONTENT_LEN = 'Prop-content-length'
 TEXT_CONTENT_LEN = 'Text-content-length'
 TEXT_COPY_SOURCE_MD5 = 'Text-copy-source-md5'
 TEXT_COPY_SOURCE_SHA1 = 'Text-copy-source-sha1'
+TEXT_DELTA = 'Text-delta'
+TEXT_DELTA_BASE_MD5 = 'Text-delta-base-md5'
+TEXT_DELTA_BASE_SHA1 = 'Text-delta-base-sha1'
 NODE_PATH = 'Node-path'
 NODE_KIND = 'Node-kind'
 NODE_ACTION = 'Node-action'
@@ -145,11 +150,12 @@ class Record(object):
     Encapsulates the logic for node records and revision records.
     """
 
-    def __init__(self):
+    def __init__(self, dump_format=2):
         self.head = {}
         self.order_head = []  # This is dictionary of tuples to act as an OrderedDict
         self.order_prop = []
         self.body = None
+        self.dump_format = dump_format
 
     def _add_header(self, key, value):
         """
@@ -206,6 +212,7 @@ class Record(object):
         Writes out the body of the record.
         """
         d_file.write(self.body)
+        assert int(self.head[TEXT_CONTENT_LEN]) == len(self.body)
         write_empty_lines(d_file, 2)
 
     def write_segment(self, d_file):
@@ -225,7 +232,7 @@ class Record(object):
         """
         pos = d_file.tell()
         line = d_file.readline()
-        while line == '\n':
+        while line == '\n' or line.startswith('* Dumped revision '):
             pos = d_file.tell()
             line = d_file.readline()
         d_file.seek(pos)
@@ -267,7 +274,10 @@ class Record(object):
                 prop_list.remove(PROP_END)
             symbol = None
             content = ''
-            prog = re.compile('^[KV] [\d]+$')
+            if self.dump_format == 2:
+              prog = re.compile('^[KV] [\d]+$')
+            else: # Version format 3
+              prog = re.compile('^[KVD] [\d]+$')
             for line in prop_list:
                 if not symbol:
                     symbol = line + '\n'
@@ -302,7 +312,7 @@ class Record(object):
         Remove a pre-existing header if it shares the same key.
         """
         self.head[key] = value
-        insert = True 
+        insert = True
         for i, prop in enumerate(self.order_head):
             if prop[0] == key:
                 self.order_head[i] = (prop[0], value)
@@ -325,9 +335,17 @@ class MatchFiles(object):
     Determines which files are included in the final output repository.
     """
 
-    def __init__(self, include):
+    def __init__(self, include, debug=False):
         self.include = include  # Whether these are matches to include or matches to exclude
+        self.debug = debug
         self.matches = {}
+
+    def __repr__(self):
+        match_output = pprint.pformat(self.matches)
+        if self.include:
+          return 'Include the following matches:\n' + match_output
+        else:
+          return 'Exclude the following matches:\n' + match_output
 
     def _extract_path(self, path):
         """
@@ -386,6 +404,12 @@ class MatchFiles(object):
             curr = curr[comp]
         if 1 in curr:
             result = True
+        if self.debug:
+            if self.include:
+                 verb = 'including'
+            else:
+                 verb = 'excluding'
+            print 'Checking path {0} - {1} result'.format(path, verb)
         if self.include:
             return result
         else:
@@ -418,12 +442,10 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     command_list = ['svnlook']
     if filtering:  # svn tree
         command_list.extend([filtering, '-r', rev_num, command, repo_path, file_path])
-        if debug:
-            print command_list
     else:  # svn cat
         command_list.extend(['-r', rev_num, command, repo_path, file_path])
-        if debug:
-            print command_list
+    if debug:
+        print command_list
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
         process = subprocess.Popen(command_list, stdout = stdout_temp_file, stderr = stderr_temp_file)
         exit_code = process.wait()
@@ -439,17 +461,17 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
             return out
 
 
-def handle_missing_file(d_file, from_path, destination, rev_num, repo_path, debug):
+def handle_missing_file(d_file, from_path, destination, rev_num, repo_path, dump_version, debug):
     """
     If a file is missing from an excluded path and needs to be included in the final
     dump file, an add operation is appended to the dump file with the contents of that
     missing file.
     """
     file_body = run_svnlook_command("cat", rev_num, repo_path, from_path, None, debug)
-    add_file_to_dump(d_file, destination, file_body)
+    add_file_to_dump(d_file, destination, dump_version, file_body)
 
 
-def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path, debug):
+def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path, dump_version, debug):
     """
     If a directory is missing from an excluded path and needs to be included in the final
     dump file, an add operation is appended to the dump directory with the contents of that
@@ -466,21 +488,21 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
     files = filter(lambda a: a != ' ' and a != '', output)
     for transfer_file in files:
         if transfer_file[-1] == '/':
-            add_dir_to_dump(d_file, destination + '/' + transfer_file[len(from_path) + 1:])
+            add_dir_to_dump(d_file, destination + '/' + transfer_file[len(from_path) + 1:], dump_version)
         elif transfer_file == from_path + '/':
-            add_dir_to_dump(d_file, destination)
+            add_dir_to_dump(d_file, destination, dump_version)
         else:
             file_from = from_path + '/' + transfer_file[len(from_path) + 1:]
             file_dest = destination + '/' + transfer_file[len(from_path) + 1:]
-            handle_missing_file(d_file, file_from, file_dest, rev_num, repo_path, debug)
+            handle_missing_file(d_file, file_from, file_dest, rev_num, repo_path, dump_version, debug)
 
 
-def create_node_record(file_path, kind, body=None):
+def create_node_record(file_path, kind, dump_version, body=None):
     """
     Creates a node record for directories to add in excluded items. The node record will
     contain a header with a key of 'svndumpfilter:generated' and a value of 'True'.
     """
-    node_rec = Record()
+    node_rec = Record(dump_format=dump_version)
     node_rec.type = 'Node'
     header = [(NODE_PATH, file_path), (NODE_ACTION, 'add'), (NODE_KIND, kind), (PROP_CONTENT_LEN, PROPERTY_BYTES)]
     if body:
@@ -493,19 +515,19 @@ def create_node_record(file_path, kind, body=None):
     return node_rec
 
 
-def add_dir_to_dump(d_file, file_path):
+def add_dir_to_dump(d_file, file_path, dump_version):
     """
     Creates a node record that adds a directory to the output dump file.
     """
-    node_rec = create_node_record(file_path, 'dir')
+    node_rec = create_node_record(file_path, 'dir', dump_version)
     node_rec.write_segment(d_file)
 
 
-def add_file_to_dump(d_file, file_path, body):
+def add_file_to_dump(d_file, file_path, dump_version, body):
     """
     Creates a node record that adds a file to the output dump file.
     """
-    node_rec = create_node_record(file_path, 'file', body)
+    node_rec = create_node_record(file_path, 'file', dump_version, body=body)
     node_rec.write_segment(d_file)
 
 
@@ -520,7 +542,7 @@ class Node(object):
         self.matches = matches
 
 
-def add_dependents(to_write, matches):
+def add_dependents(to_write, matches, dump_version):
     """
     Adds dependent directories that are required to start at a non-top-level path for path matching.
     """
@@ -532,28 +554,28 @@ def add_dependents(to_write, matches):
                 to_process.append(Node(node.path + item + '/', node.matches[item]))
                 dir_to_add.append(node.path + item + '/')
     for dir_path in dir_to_add:
-        node_rec = create_node_record(dir_path[:-1], 'dir')
+        node_rec = create_node_record(dir_path[:-1], 'dir', dump_version)
         to_write.append(node_rec)
 
 
-def handle_deleting_file(d_file, file_path):
+def handle_deleting_file(d_file, file_path, dump_version):
     """
     Appends a node record to delete a file.
     Not necessary in current implementation v1.0 of this filter.
     """
-    node_rec = Record()
+    node_rec = Record(dump_format=dump_version)
     node_rec.type = 'Node'
     node_rec.order_head = [(NODE_PATH, file_path), (NODE_ACTION, 'delete'), (NODE_KIND, 'file')]
     node_rec.head = dict(node_rec.order_head)
     node_rec.write_segment(d_file)
 
 
-def handle_deleting_directory(d_file, file_path):
+def handle_deleting_directory(d_file, file_path, dump_version):
     """
     Appends a node record to delete a file.
     Not necessary in current implementation v1.0 of this filter.
     """
-    node_rec = Record()
+    node_rec = Record(dump_format=dump_version)
     node_rec.type = 'Node'
     node_rec.order_head = [(NODE_PATH, file_path), (NODE_ACTION, 'add'), (NODE_KIND, 'dir')]
     node_rec.head = dict(node_rec.order_head)
@@ -599,7 +621,7 @@ def create_matcher(include, matches, opt):
     Creates the path matcher with the paths provided by the command-line and optionally paths
     provided by a file.
     """
-    matcher = MatchFiles(include)
+    matcher = MatchFiles(include, opt.debug)
     for match in matches:
         matcher.add_to_matches(match)
     if opt.file:
@@ -610,14 +632,17 @@ def create_matcher(include, matches, opt):
 def write_dump_header(input_file, output_file, opt):
     """
     Write out the header for and check the version of the dump file.
+    Returns the version found.
     """
     dump = DumpHeader()
     dump.extract_dump_header(input_file)
-    if dump.version != 2:
+    if dump.version not in VALID_DUMP_FORMAT_VERSIONS:
         if not opt.quiet:
-            sys.stderr.write('Version Incompatible (Requires Version 2)')
+            versions  = [str(v) for v in VALID_DUMP_FORMAT_VERSIONS]
+            sys.stderr.write('Version Incompatible (Requires Version {0})\n'.format(' or '.join(versions)))
         sys.exit(1)
     write_segments(output_file, [dump])
+    return dump.version
 
 
 def print_scan_results(scan, safe):
@@ -631,7 +656,7 @@ def print_scan_results(scan, safe):
             print 'Unsafe: Untangling is necessary to carve these paths.'
 
 
-def process_revision_record(rev_map, include, check, flags, opt):
+def process_revision_record(rev_map, check, include, flags, opt, dump_version):
     """
     Handles renumbering and starting at a specific revision for the revision record.
     Checks to see if dependent files need to be added.
@@ -644,11 +669,11 @@ def process_revision_record(rev_map, include, check, flags, opt):
     flags['to_write'].append(rev_seg)
     rev_map[str(flags['orig_rev'])] = str(flags['renum_rev'])
     if include and int(rev_seg.head[REV_NUM]) == 1:  # Revision 0 can't contain Node Records
-        add_dependents(flags['to_write'], check.matches)
+        add_dependents(flags['to_write'], check.matches, dump_version)
     return rev_seg
 
 
-def handle_exclude_to_include(node_seg, output_file, flags, opt):
+def handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version):
     """
     Write out current records in the queue.
     Process node segments that go from an excluded path to an included path.
@@ -664,12 +689,13 @@ def handle_exclude_to_include(node_seg, output_file, flags, opt):
         flags['renum_rev'] += 1
         flags['did_increment'] = True
     flags['to_write'] = []  # Need to write items in queue because we know that this revision won't be empty
+    flags['untangled'] = True
     if node_seg.head[NODE_KIND] == 'file':
-        handle_missing_file(output_file, node_seg.head[NODE_COPYFROM_PATH], node_seg.head[NODE_PATH],
-                            node_seg.head[NODE_COPYFROM_REV], opt.repo, opt.debug)
+        handle_missing_file(output_file, node_seg.head[NODE_PATH], node_seg.head[NODE_PATH],
+                            str(flags['orig_rev']), opt.repo, dump_version, opt.debug)
     else:
         handle_missing_directory(output_file, node_seg.head[NODE_COPYFROM_PATH], node_seg.head[NODE_PATH],
-                                 node_seg.head[NODE_COPYFROM_REV], opt.repo, opt.debug)
+                                 node_seg.head[NODE_COPYFROM_REV], opt.repo, dump_version, opt.debug)
 
 
 def handle_include_to_exclude(output_file, flags, opt):
@@ -684,17 +710,22 @@ def handle_include_to_exclude(output_file, flags, opt):
     flags['to_write'] = []
 
 
-def write_included(rev_map, node_seg, flags, opt):
+def write_included(rev_map, node_seg, flags, opt, untangled=False):
     """
     Optionally map the current revision to a renumbered revision for the node record. Include the record to be written.
+
+    If the node has already been untangled, there is no need to add in the copyfrom revision information.
     """
     if opt.renumber_revs:
-        if NODE_COPYFROM_REV in node_seg.head:
+        if NODE_COPYFROM_REV in node_seg.head and not untangled:
             orig_copy_rev = node_seg.head[NODE_COPYFROM_REV]
             new_copy_rev = rev_map[orig_copy_rev]
             next = str(int(orig_copy_rev) + 1)
+            print '>>setting new_copy_rev: {0}'.format(new_copy_rev)
+            print '>>next: {0}'.format(next)
             if int(new_copy_rev) == int(flags['renum_rev']) or (next in rev_map and int(new_copy_rev) == int(rev_map[next])):
                 new_copy_rev = str(int(new_copy_rev) - 1)
+                print '>>Updating new_copy_rev: {0}'.format(new_copy_rev)
             node_seg.update_head(NODE_COPYFROM_REV, new_copy_rev)
     flags['to_write'].append(node_seg)
 
@@ -710,19 +741,23 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
     flags = {
         'can_write': opt.start_revision is None,  # Set to True when your revision number is > start_revision.
-        'safe': True,  # False if untangling is necessary ; determines whether svnlook is required
-        'warning_given': False,  # Whether a warning has been given for untangling
-        'orig_rev': 0,  # Original input dump file's revision number
-        'renum_rev': 0,  # Renumbered revision number for output dump file
-        'next_rev': None,  # Stores an extracted revision record
-        'did_increment': None,  # Prevents multiple increments for 1 revision
-        'to_write': [],  # List of items to write
+        'safe': True,                             # False if untangling is necessary ; determines whether svnlook is required
+        'warning_given': False,                   # Whether a warning has been given for untangling
+        'untangled': False,                       # True if untangled. Do not want to add to skip revision list when untangling
+        'orig_rev': 0,                            # Original input dump file's revision number
+        'renum_rev': 0,                           # Renumbered revision number for output dump file
+        'next_rev': None,                         # Stores an extracted revision record
+        'did_increment': None,                    # Prevents multiple increments for 1 revision
+        'to_write': [],                           # List of items to write
     }
 
     print "Starting to filter dumpfile : %s " % input_dump
+    debug = opt.debug
     rev_map = {}  # Stores the mappings for revisions when renumbering { 'original revision': 'renumbered revision' }
     empty_revs = set()  # Stores dropped revisions numbers
     check = create_matcher(include, matches, opt)
+    if debug:
+        print 'Match expression:\n{0}'.format(check)
     if not opt.scan:
         clean_up(output_dump)
     else:
@@ -730,21 +765,21 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
     with open(input_dump, 'rb') as input_file:
         with open(output_dump, 'a+b') as output_file:
-            write_dump_header(input_file, output_file, opt)
+            dump_version = write_dump_header(input_file, output_file, opt)
             try:
                 while True:
                     if not opt.quiet:
                         print '---- Working on Input Revision %s (Renumber Rev: %s) ----' % (flags['orig_rev'], flags['renum_rev'])
                     flags['to_write'] = []
                     if not flags['next_rev']:  # This is the first revision (rev 0).
-                        rev_seg = Record()
+                        rev_seg = Record(dump_format=dump_version)
                         rev_seg.extract_segment(input_file)
                         flags['to_write'].append(rev_seg)
                     else:
-                        rev_seg = process_revision_record(rev_map, include, check, flags, opt)
+                        rev_seg = process_revision_record(rev_map, check, include, flags, opt, dump_version)
                     while True:
                         flags['did_increment'] = False  # Want to only increment once for each revision
-                        node_seg = Record()
+                        node_seg = Record(dump_format=dump_version)
                         node_seg.extract_segment(input_file)
                         if node_seg.type == 'Revision':
                             flags['next_rev'] = node_seg
@@ -755,7 +790,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                     if opt.strip_merge:
                                         to_strip = [i for i, v in enumerate(node_seg.order_prop) if v[1] == SVN_MERGEINFO]
                                         for i in sorted(to_strip, reverse=True):
-                                            print 'Stripping property: %s' % (SVN_MERGEINFO.rstrip()) 
+                                            print 'Stripping property: %s' % (SVN_MERGEINFO.rstrip())
                                             # Strip key and value
                                             del node_seg.order_prop[i:i+2]
                                             # Recalculate Text and Prop content-length
@@ -764,27 +799,50 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                         if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or
                                         	(opt.start_revision and int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision))) or
                                         	(NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
-                                            if TEXT_CONTENT_LEN in node_seg.head:
+                                            if TEXT_CONTENT_LEN in node_seg.head and not (dump_version == 3 and TEXT_DELTA in node_seg.head):
                                                 print '%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN)
-                                                print 'Stripping: %s' % (NODE_COPYFROM_REV) 
+                                                if debug:
+                                                    print 'Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_REV])
+                                                    print 'Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_PATH])
                                                 node_seg.order_head.remove((NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
-                                                print 'Stripping: %s' % (NODE_COPYFROM_PATH) 
                                                 node_seg.order_head.remove((NODE_COPYFROM_PATH, node_seg.head[NODE_COPYFROM_PATH]))
                                                 if TEXT_COPY_SOURCE_MD5 in node_seg.head:
+                                                    if debug:
+                                                        print 'Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_MD5])
                                                     node_seg.order_head.remove((TEXT_COPY_SOURCE_MD5, node_seg.head[TEXT_COPY_SOURCE_MD5]))
                                                 if TEXT_COPY_SOURCE_SHA1 in node_seg.head:
+                                                    if debug:
+                                                        print 'Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_SHA1])
                                                     node_seg.order_head.remove((TEXT_COPY_SOURCE_SHA1, node_seg.head[TEXT_COPY_SOURCE_SHA1]))
-                                                write_included(rev_map, node_seg, flags, opt)
+                                                if dump_version == 3:
+                                                    if TEXT_DELTA in node_seg.head:
+                                                        if debug:
+                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA])
+                                                        node_seg.order_head.remove((TEXT_DELTA, node_seg.head[TEXT_DELTA]))
+                                                    if TEXT_DELTA_BASE_MD5 in node_seg.head:
+                                                        if debug:
+                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_MD5])
+                                                        node_seg.order_head.remove((TEXT_DELTA_BASE_MD5, node_seg.head[TEXT_DELTA_BASE_MD5]))
+                                                    if TEXT_DELTA_BASE_SHA1 in node_seg.head:
+                                                        if debug:
+                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_SHA1])
+                                                        node_seg.order_head.remove((TEXT_DELTA_BASE_SHA1, node_seg.head[TEXT_DELTA_BASE_SHA1]))
+                                                write_included(rev_map, node_seg, flags, opt, untangled=True)
                                             else:
                                                 print '%s: %s is in skipped revisions, trying to untangle' % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV])
-                                                handle_exclude_to_include(node_seg, output_file, flags, opt)
+                                                handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version)
                                         else:
                                             write_included(rev_map, node_seg, flags, opt)
                                     else:
                                         write_included(rev_map, node_seg, flags, opt)
-                    if flags['can_write'] and not len(flags['to_write']) > 1:  # Adding revision to skipped revs set
-                        print 'Adding revision %s to the skipped revisions list' % (flags['orig_rev'])  # [!!!]
-                        empty_revs.add(flags['orig_rev'])
+                    if flags['can_write'] and not len(flags['to_write']) > 1:
+                        # Adding revision to skipped revs set unless untangled
+                        if flags['untangled']:
+                            # Reset flag
+                            flags['untangled'] = False
+                        else:
+                            print 'Adding revision %s to the skipped revisions list' % (flags['orig_rev'])  # [!!!]
+                            empty_revs.add(flags['orig_rev'])
                     if not opt.drop_empty or len(flags['to_write']) > 1:
                         if flags['can_write']:
                             write_segments(output_file, flags['to_write'])
@@ -795,6 +853,10 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                         write_segments(output_file, flags['to_write'])
                         flags['renum_rev'] += 1
                     flags['orig_rev'] += 1
+                    if debug:
+                        print '>>> Now at {0}:{1}'.format(flags['orig_rev'], flags['renum_rev'])
+                        print '>>> Flags setting'
+                        pprint.pprint(flags)
             except FinishedFiltering:
                 if not opt.scan:
                     write_segments(output_file, flags['to_write'])
