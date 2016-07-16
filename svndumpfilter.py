@@ -806,6 +806,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                                     print 'Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_PATH])
                                                 node_seg.order_head.remove((NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
                                                 node_seg.order_head.remove((NODE_COPYFROM_PATH, node_seg.head[NODE_COPYFROM_PATH]))
+                                                del node_seg.head[NODE_COPYFROM_REV]  # write_included() tests for this (opt.renumber_revs)
                                                 if TEXT_COPY_SOURCE_MD5 in node_seg.head:
                                                     if debug:
                                                         print 'Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_MD5])
