@@ -683,7 +683,7 @@ def handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version):
         raise FinishedFiltering('Tangling is necessary')
     if not flags['warning_given']:
         print 'Warning: svnlook is required to pull missing files'
-        flags['warning_given'] = False
+        flags['warning_given'] = True
     write_segments(output_file, flags['to_write'])
     if opt.renumber_revs and not flags['did_increment']:
         flags['renum_rev'] += 1
