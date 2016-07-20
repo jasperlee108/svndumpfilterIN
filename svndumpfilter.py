@@ -94,6 +94,18 @@ NODE_COPYFROM_REV = 'Node-copyfrom-rev'
 PROP_END = 'PROPS-END'
 SVN_MERGEINFO = 'svn:mergeinfo\n'
 
+def encode_to_fs(name):
+    """
+    Converts the utf-8 name to the file system encoding
+    """
+    return name.decode('utf-8').encode(sys.getfilesystemencoding())
+
+def decode_from_fs(filename):
+    """
+    Converts the filename from the file system encoding to utf-8
+    """
+    return filename.decode(sys.getfilesystemencoding()).encode('utf-8')
+
 def write_empty_lines(d_file, number=1):
     """
     Writes a variable number of empty lines.
@@ -439,6 +451,7 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     """
     Runs svnlook to grab the contents of a repository or the contents of a file.
     """
+    file_path = encode_to_fs(file_path)
     command_list = ['svnlook']
     if filtering:  # svn tree
         command_list.extend([filtering, '-r', rev_num, command, repo_path, file_path])
@@ -487,6 +500,7 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
     output = output.splitlines()
     files = filter(lambda a: a != ' ' and a != '', output)
     for transfer_file in files:
+        transfer_file = decode_from_fs(transfer_file)
         if transfer_file[-1] == '/':
             add_dir_to_dump(d_file, destination + '/' + transfer_file[len(from_path) + 1:], dump_version)
         elif transfer_file == from_path + '/':
