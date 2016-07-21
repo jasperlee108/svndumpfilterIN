@@ -94,17 +94,20 @@ NODE_COPYFROM_REV = 'Node-copyfrom-rev'
 PROP_END = 'PROPS-END'
 SVN_MERGEINFO = 'svn:mergeinfo\n'
 
+
 def encode_to_fs(name):
     """
     Converts the utf-8 name to the file system encoding
     """
     return name.decode('utf-8').encode(sys.getfilesystemencoding())
 
+
 def decode_from_fs(filename):
     """
     Converts the filename from the file system encoding to utf-8
     """
     return filename.decode(sys.getfilesystemencoding()).encode('utf-8')
+
 
 def write_empty_lines(d_file, number=1):
     """
@@ -287,9 +290,9 @@ class Record(object):
             symbol = None
             content = ''
             if self.dump_format == 2:
-              prog = re.compile('^[KV] [\d]+$')
-            else: # Version format 3
-              prog = re.compile('^[KVD] [\d]+$')
+                prog = re.compile('^[KV] [\d]+$')
+            else:  # Version format 3
+                prog = re.compile('^[KVD] [\d]+$')
             for line in prop_list:
                 if not symbol:
                     symbol = line + '\n'
@@ -330,7 +333,7 @@ class Record(object):
                 self.order_head[i] = (prop[0], value)
                 insert = False
                 break
-        if insert == True:
+        if insert:
             self.order_head.insert(0, (key, value))
 
     def __repr__(self):
@@ -355,9 +358,9 @@ class MatchFiles(object):
     def __repr__(self):
         match_output = pprint.pformat(self.matches)
         if self.include:
-          return 'Include the following matches:\n' + match_output
+            return 'Include the following matches:\n' + match_output
         else:
-          return 'Exclude the following matches:\n' + match_output
+            return 'Exclude the following matches:\n' + match_output
 
     def _extract_path(self, path):
         """
@@ -418,9 +421,9 @@ class MatchFiles(object):
             result = True
         if self.debug:
             if self.include:
-                 verb = 'including'
+                verb = 'including'
             else:
-                 verb = 'excluding'
+                verb = 'excluding'
             print 'Checking path {0} - {1} result'.format(path, verb)
         if self.include:
             return result
@@ -460,7 +463,7 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     if debug:
         print command_list
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
-        process = subprocess.Popen(command_list, stdout = stdout_temp_file, stderr = stderr_temp_file)
+        process = subprocess.Popen(command_list, stdout=stdout_temp_file, stderr=stderr_temp_file)
         exit_code = process.wait()
         if exit_code:
             stderr_temp_file.flush()
@@ -653,7 +656,7 @@ def write_dump_header(input_file, output_file, opt):
     dump.extract_dump_header(input_file)
     if dump.version not in VALID_DUMP_FORMAT_VERSIONS:
         if not opt.quiet:
-            versions  = [str(v) for v in VALID_DUMP_FORMAT_VERSIONS]
+            versions = [str(v) for v in VALID_DUMP_FORMAT_VERSIONS]
             sys.stderr.write('Version Incompatible (Requires Version {0})\n'.format(' or '.join(versions)))
         sys.exit(1)
     write_segments(output_file, [dump])
@@ -817,9 +820,9 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                             # Recalculate Text and Prop content-length
                                             update_prop_len(node_seg)
                                     if NODE_COPYFROM_REV in node_seg.head:
-                                        if ((int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or
-                                        	(opt.start_revision and int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision))) or
-                                        	(NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):  # Check if in skipped revs:
+                                        if (int(node_seg.head[NODE_COPYFROM_REV]) in empty_revs or
+                                                (opt.start_revision and int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision)) or
+                                                (NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):
                                             if TEXT_CONTENT_LEN in node_seg.head and not (dump_version == 3 and TEXT_DELTA in node_seg.head):
                                                 print '%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN)
                                                 if debug:
@@ -850,7 +853,8 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                                         node_seg.order_head.remove((TEXT_DELTA_BASE_SHA1, node_seg.head[TEXT_DELTA_BASE_SHA1]))
                                                 write_included(rev_map, node_seg, flags, opt, untangled=True)
                                             else:
-                                                print '%s: %s is in skipped revisions, trying to untangle' % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV])
+                                                print '%s: %s is in skipped revisions, trying to untangle'\
+                                                    % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV])
                                                 handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version)
                                         else:
                                             write_included(rev_map, node_seg, flags, opt)
