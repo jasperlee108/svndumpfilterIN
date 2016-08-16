@@ -109,6 +109,42 @@ reproduce it.
 
 Patches are also welcome to the problems you encounter.
 
+For development it is recommended use the following set up:
+   1. Use python version 2.7
+   2. Set up a virtual environment:
+
+          % cd <your_git_workspace>
+          % virtualenv venv
+          % source venv/bin/activate
+
+      See http://docs.python-guide.org/en/latest/dev/virtualenvs/ for
+      more details.
+   3. Use pytest for running unit tests. To set up
+      (once in your virutal environment):
+
+          % pip install pytest
+
+      See http://doc.pytest.org/en/latest/ for more details.
+   4. Use pep8 for adherence to style guidelines. To set up
+      (once in your virutal environment):
+
+          % pip install pep8
+
+      See https://pypi.python.org/pypi/pep8 for more details.
+
+Prior to submitting a patch please:
+   1. Check your changes adhere to style guidelines by ensuring
+      the following passes with no complaints:
+
+          % pep8 svndumpfilter.py test_svndumpfilter.py
+
+   2. Add unit test(s) to test_svndumpfilter.py demonstrating the
+      problem and fix in your patch.
+   3. Ensure all unit tests pass using pytest:
+
+          % py.test test_svndumpfilter.py
+
+
 
 
 
