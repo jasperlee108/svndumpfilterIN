@@ -4,6 +4,7 @@ svndumpfilterIN
 
 An implementation of Apache's svndumpfilter that solves some common problems.
 
+[![Build Status](https://travis-ci.org/jasperlee108/svndumpfilterIN.svg?branch=master)](https://travis-ci.org/jasperlee108/svndumpfilterIN)
 
 ## Requirements ##
 
