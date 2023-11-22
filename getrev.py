@@ -29,5 +29,6 @@ def main():
             line = fd.readline()
         print('{0}'.format(''.join(buffer)))
 
+
 if __name__ == '__main__':
     main()
