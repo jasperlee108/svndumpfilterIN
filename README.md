@@ -11,7 +11,7 @@ An implementation of Apache's svndumpfilter that solves some common problems.
 
 svndumpfilterIN was developed on a Linux machine using
 
-  * Python 2.6.6
+  * Python 3.10.13
   * nosetests version 1.1.2
 
 
@@ -28,12 +28,12 @@ target directory.
 
 Example Usage:
 
-    sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
+    sudo python3 svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
 
 Runs the svndumpfilter on `input_name.dump` from `repo_path` to carve out `directory_name`
 and save the result to `output_name.dump`.
 
-See also `python svndumpfilter.py --help`.
+See also `python3 svndumpfilter.py --help`.
 
 ## Implementation ##
 
@@ -111,27 +111,28 @@ reproduce it.
 Patches are also welcome to the problems you encounter.
 
 For development it is recommended use the following set up:
-   1. Use python version 2.7
+   1. Use python version 3.10.13
    2. Set up a virtual environment:
 
           % cd <your_git_workspace>
-          % virtualenv venv
+          % python3 -m venv venv
           % source venv/bin/activate
 
-      See http://docs.python-guide.org/en/latest/dev/virtualenvs/ for
-      more details.
+      See [Virtual Environment and Packages](https://docs.python.org/3/tutorial/venv.html)
+      for more details.
    3. Use pytest for running unit tests. To set up
       (once in your virutal environment):
 
           % pip install pytest
 
-      See http://doc.pytest.org/en/latest/ for more details.
+      See the [pytest documentation](https://docs.pytest.org/en) for more details.
    4. Use pycodestyle for adherence to style guidelines. To set up
       (once in your virutal environment):
 
           % pip install pycodestyle
 
-      See https://pycodestyle.pycqa.org/en/latest/ for more details.
+      See the [pycodestyle documentation](https://pycodestyle.pycqa.org/en/latest/)
+      for more details.
 
 Prior to submitting a patch please:
    1. Check your changes adhere to style guidelines by ensuring
