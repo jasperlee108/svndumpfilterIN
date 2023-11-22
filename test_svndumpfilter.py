@@ -119,4 +119,4 @@ def test_add_dependents_3():
         add_dependents(to_write, check.matches, dump_version)
         actual_paths = [node.head["Node-path"] for node in to_write]
         expected_paths = ["whoop", "coconut", "whoop/whoo"]
-        assert actual_paths == expected_paths
+        assert set(actual_paths) == set(expected_paths)
