@@ -12,7 +12,7 @@ def path_match_exclude(expected, excluded):
     check = MatchFiles(False)
     for item in excluded:
         check.add_to_matches(item)
-    for path, result in expected.iteritems():
+    for path, result in expected.items():
         assert check.is_included(path) == result
     return True
 
@@ -24,7 +24,7 @@ def path_match_include(expected, included):
     check = MatchFiles(True)
     for item in included:
         check.add_to_matches(item)
-    for path, result in expected.iteritems():
+    for path, result in expected.items():
         assert check.is_included(path) == result
 
 

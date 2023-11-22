@@ -290,9 +290,9 @@ class Record(object):
             symbol = None
             content = ''
             if self.dump_format == 2:
-                prog = re.compile('^[KV] [\d]+$')
+                prog = re.compile(r'^[KV] [\d]+$')
             else:  # Version format 3
-                prog = re.compile('^[KVD] [\d]+$')
+                prog = re.compile(r'^[KVD] [\d]+$')
             for line in prop_list:
                 if not symbol:
                     symbol = line + '\n'
@@ -424,7 +424,7 @@ class MatchFiles(object):
                 verb = 'including'
             else:
                 verb = 'excluding'
-            print 'Checking path {0} - {1} result'.format(path, verb)
+            print('Checking path {0} - {1} result'.format(path, verb))
         if self.include:
             return result
         else:
@@ -461,7 +461,7 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     else:  # svn cat
         command_list.extend(['-r', rev_num, command, repo_path, file_path])
     if debug:
-        print command_list
+        print(command_list)
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
         process = subprocess.Popen(command_list, stdout=stdout_temp_file, stderr=stderr_temp_file)
         exit_code = process.wait()
@@ -501,7 +501,7 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
     """
     output = run_svnlook_command('tree', rev_num, repo_path, from_path, '--full-paths', debug)
     output = output.splitlines()
-    files = filter(lambda a: a != ' ' and a != '', output)
+    files = [a for a in output if a != ' ' and a != '']
     for transfer_file in files:
         transfer_file = decode_from_fs(transfer_file)
         if transfer_file[-1] == '/':
@@ -669,9 +669,9 @@ def print_scan_results(scan, safe):
     """
     if scan:
         if safe:
-            print 'Safe: No untangling is necessary to carve these paths.'
+            print('Safe: No untangling is necessary to carve these paths.')
         else:
-            print 'Unsafe: Untangling is necessary to carve these paths.'
+            print('Unsafe: Untangling is necessary to carve these paths.')
 
 
 def process_revision_record(rev_map, check, include, flags, opt, dump_version):
@@ -701,7 +701,7 @@ def handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version):
         flags['safe'] = False
         raise FinishedFiltering('Tangling is necessary')
     if not flags['warning_given']:
-        print 'Warning: svnlook is required to pull missing files'
+        print('Warning: svnlook is required to pull missing files')
         flags['warning_given'] = True
     write_segments(output_file, flags['to_write'])
     if opt.renumber_revs and not flags['did_increment']:
@@ -742,11 +742,11 @@ def write_included(rev_map, node_seg, flags, opt, untangled=False):
             orig_copy_rev = node_seg.head[NODE_COPYFROM_REV]
             new_copy_rev = rev_map[orig_copy_rev]
             next = str(int(orig_copy_rev) + 1)
-            print '>>setting new_copy_rev: {0}'.format(new_copy_rev)
-            print '>>next: {0}'.format(next)
+            print('>>setting new_copy_rev: {0}'.format(new_copy_rev))
+            print('>>next: {0}'.format(next))
             if int(new_copy_rev) == int(flags['renum_rev']) or (next in rev_map and int(new_copy_rev) == int(rev_map[next])):
                 new_copy_rev = str(int(new_copy_rev) - 1)
-                print '>>Updating new_copy_rev: {0}'.format(new_copy_rev)
+                print('>>Updating new_copy_rev: {0}'.format(new_copy_rev))
             node_seg.update_head(NODE_COPYFROM_REV, new_copy_rev)
     flags['to_write'].append(node_seg)
     flags['included'] = True
@@ -774,13 +774,13 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
         'included': False,                        # to_write list must be written
     }
 
-    print "Starting to filter dumpfile : %s " % input_dump
+    print("Starting to filter dumpfile : %s " % input_dump)
     debug = opt.debug
     rev_map = {}  # Stores the mappings for revisions when renumbering { 'original revision': 'renumbered revision' }
     empty_revs = set()  # Stores dropped revisions numbers
     check = create_matcher(include, matches, opt)
     if debug:
-        print 'Match expression:\n{0}'.format(check)
+        print('Match expression:\n{0}'.format(check))
     if not opt.scan:
         clean_up(output_dump)
     else:
@@ -792,7 +792,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
             try:
                 while True:
                     if not opt.quiet:
-                        print '---- Working on Input Revision %s (Renumber Rev: %s) ----' % (flags['orig_rev'], flags['renum_rev'])
+                        print('---- Working on Input Revision %s (Renumber Rev: %s) ----' % (flags['orig_rev'], flags['renum_rev']))
                     flags['to_write'] = []
                     flags['included'] = False
                     if not flags['next_rev']:  # This is the first revision (rev 0).
@@ -814,7 +814,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                     if opt.strip_merge:
                                         to_strip = [i for i, v in enumerate(node_seg.order_prop) if v[1] == SVN_MERGEINFO]
                                         for i in sorted(to_strip, reverse=True):
-                                            print 'Stripping property: %s' % (SVN_MERGEINFO.rstrip())
+                                            print('Stripping property: %s' % (SVN_MERGEINFO.rstrip()))
                                             # Strip key and value
                                             del node_seg.order_prop[i:i+2]
                                             # Recalculate Text and Prop content-length
@@ -824,37 +824,37 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                                 (opt.start_revision and int(node_seg.head[NODE_COPYFROM_REV]) < int(opt.start_revision)) or
                                                 (NODE_COPYFROM_REV in node_seg.head and not check.is_included(node_seg.head[NODE_COPYFROM_PATH]))):
                                             if TEXT_CONTENT_LEN in node_seg.head and not (dump_version == 3 and TEXT_DELTA in node_seg.head):
-                                                print '%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN)
+                                                print('%s with %s, no untangling is neccecary' % (NODE_COPYFROM_REV, TEXT_CONTENT_LEN))
                                                 if debug:
-                                                    print 'Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_REV])
-                                                    print 'Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_PATH])
+                                                    print('Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_REV]))
+                                                    print('Stripping: {0}'.format(node_seg.head[NODE_COPYFROM_PATH]))
                                                 node_seg.order_head.remove((NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
                                                 node_seg.order_head.remove((NODE_COPYFROM_PATH, node_seg.head[NODE_COPYFROM_PATH]))
                                                 if TEXT_COPY_SOURCE_MD5 in node_seg.head:
                                                     if debug:
-                                                        print 'Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_MD5])
+                                                        print('Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_MD5]))
                                                     node_seg.order_head.remove((TEXT_COPY_SOURCE_MD5, node_seg.head[TEXT_COPY_SOURCE_MD5]))
                                                 if TEXT_COPY_SOURCE_SHA1 in node_seg.head:
                                                     if debug:
-                                                        print 'Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_SHA1])
+                                                        print('Stripping: {0}'.format(node_seg.head[TEXT_COPY_SOURCE_SHA1]))
                                                     node_seg.order_head.remove((TEXT_COPY_SOURCE_SHA1, node_seg.head[TEXT_COPY_SOURCE_SHA1]))
                                                 if dump_version == 3:
                                                     if TEXT_DELTA in node_seg.head:
                                                         if debug:
-                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA])
+                                                            print('Stripping: {0}'.format(node_seg.head[TEXT_DELTA]))
                                                         node_seg.order_head.remove((TEXT_DELTA, node_seg.head[TEXT_DELTA]))
                                                     if TEXT_DELTA_BASE_MD5 in node_seg.head:
                                                         if debug:
-                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_MD5])
+                                                            print('Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_MD5]))
                                                         node_seg.order_head.remove((TEXT_DELTA_BASE_MD5, node_seg.head[TEXT_DELTA_BASE_MD5]))
                                                     if TEXT_DELTA_BASE_SHA1 in node_seg.head:
                                                         if debug:
-                                                            print 'Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_SHA1])
+                                                            print('Stripping: {0}'.format(node_seg.head[TEXT_DELTA_BASE_SHA1]))
                                                         node_seg.order_head.remove((TEXT_DELTA_BASE_SHA1, node_seg.head[TEXT_DELTA_BASE_SHA1]))
                                                 write_included(rev_map, node_seg, flags, opt, untangled=True)
                                             else:
-                                                print '%s: %s is in skipped revisions, trying to untangle'\
-                                                    % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV])
+                                                print('%s: %s is in skipped revisions, trying to untangle'
+                                                      % (NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
                                                 handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version)
                                         else:
                                             write_included(rev_map, node_seg, flags, opt)
@@ -866,7 +866,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                             # Reset flag
                             flags['untangled'] = False
                         else:
-                            print 'Adding revision %s to the skipped revisions list' % (flags['orig_rev'])  # [!!!]
+                            print('Adding revision %s to the skipped revisions list' % (flags['orig_rev']))  # [!!!]
                             empty_revs.add(flags['orig_rev'])
                     if not opt.drop_empty or flags['included']:
                         if flags['can_write']:
@@ -879,13 +879,13 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                         flags['renum_rev'] += 1
                     flags['orig_rev'] += 1
                     if debug:
-                        print '>>> Now at {0}:{1}'.format(flags['orig_rev'], flags['renum_rev'])
-                        print '>>> Flags setting'
+                        print('>>> Now at {0}:{1}'.format(flags['orig_rev'], flags['renum_rev']))
+                        print('>>> Flags setting')
                         pprint.pprint(flags)
             except FinishedFiltering:
                 if not opt.scan:
                     write_segments(output_file, flags['to_write'])
-                    print 'Filtering Complete : from %s to %s' % (input_dump, output_dump)
+                    print('Filtering Complete : from %s to %s' % (input_dump, output_dump))
             print_scan_results(opt.scan, flags['safe'])
 
 
@@ -960,4 +960,4 @@ if __name__ == '__main__':
     start_time = time.time()
     main()
     # Note that this calculates "real time".
-    print 'Time Running : %s seconds' % (time.time() - start_time)
+    print('Time Running : %s seconds' % (time.time() - start_time))

@@ -126,18 +126,18 @@ For development it is recommended use the following set up:
           % pip install pytest
 
       See http://doc.pytest.org/en/latest/ for more details.
-   4. Use pep8 for adherence to style guidelines. To set up
+   4. Use pycodestyle for adherence to style guidelines. To set up
       (once in your virutal environment):
 
-          % pip install pep8
+          % pip install pycodestyle
 
-      See https://pypi.python.org/pypi/pep8 for more details.
+      See https://pycodestyle.pycqa.org/en/latest/ for more details.
 
 Prior to submitting a patch please:
    1. Check your changes adhere to style guidelines by ensuring
       the following passes with no complaints:
 
-          % pep8 svndumpfilter.py test_svndumpfilter.py
+          % pycodestyle svndumpfilter.py test_svndumpfilter.py
 
    2. Add unit test(s) to test_svndumpfilter.py demonstrating the
       problem and fix in your patch.
