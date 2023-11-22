@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # Simple script to pull a specific revision from a dump file
 
@@ -27,7 +27,7 @@ def main():
                     buffer.append(line)
                     in_revision = True
             line = fd.readline()
-        print '{0}'.format(''.join(buffer))
+        print('{0}'.format(''.join(buffer)))
 
 if __name__ == '__main__':
     main()
