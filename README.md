@@ -138,7 +138,7 @@ Prior to submitting a patch please:
    1. Check your changes adhere to style guidelines by ensuring
       the following passes with no complaints:
 
-          % pycodestyle svndumpfilter.py test_svndumpfilter.py
+          % pycodestyle *.py 
 
    2. Add unit test(s) to test_svndumpfilter.py demonstrating the
       problem and fix in your patch.
