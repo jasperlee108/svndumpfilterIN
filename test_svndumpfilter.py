@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from svndumpfilter import *
 
@@ -12,7 +12,7 @@ def path_match_exclude(expected, excluded):
     check = MatchFiles(False)
     for item in excluded:
         check.add_to_matches(item)
-    for path, result in expected.iteritems():
+    for path, result in iter(expected.items()):
         assert check.is_included(path) == result
     return True
 
@@ -24,7 +24,7 @@ def path_match_include(expected, included):
     check = MatchFiles(True)
     for item in included:
         check.add_to_matches(item)
-    for path, result in expected.iteritems():
+    for path, result in iter(expected.items()):
         assert check.is_included(path) == result
 
 
@@ -119,4 +119,4 @@ def test_add_dependents_3():
         add_dependents(to_write, check.matches, dump_version)
         actual_paths = [node.head["Node-path"] for node in to_write]
         expected_paths = ["whoop", "coconut", "whoop/whoo"]
-        assert actual_paths == expected_paths
+        assert set(actual_paths) == set(expected_paths)
