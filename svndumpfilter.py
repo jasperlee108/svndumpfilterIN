@@ -854,7 +854,6 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
     input_file = svndump_file(input_dump)
     with open(output_dump, 'a+b') as output_file:
-    # with open(output_dump, 'a+b') as output_file:
         dump_version = write_dump_header(input_file, output_file, opt)
         try:
             while True:
@@ -921,7 +920,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                             write_included(rev_map, node_seg, flags, opt, untangled=True)
                                         else:
                                             print('{}: {} is in skipped revisions, trying to untangle'.
-                                                    format(NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
+                                                  format(NODE_COPYFROM_REV, node_seg.head[NODE_COPYFROM_REV]))
                                             handle_exclude_to_include(node_seg, output_file, flags, opt, dump_version)
                                     else:
                                         write_included(rev_map, node_seg, flags, opt)
