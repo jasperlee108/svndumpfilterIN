@@ -529,7 +529,7 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     if debug:
         print(command_list)
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
-        process = subprocess.Popen(command_list, stdout=stdout_temp_file, stderr=stderr_temp_file)
+        process = subprocess.Popen(command_list, stdout=stdout_temp_file, stderr=stderr_temp_file)  # nosec B603
         exit_code = process.wait()
         if exit_code:
             stderr_temp_file.flush()

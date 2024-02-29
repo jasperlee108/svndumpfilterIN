@@ -97,7 +97,7 @@ jobs:
         if: $${{ inputs.ENABLE_BANDIT }}
         run: |
           source venv/bin/activate
-          bandit --exclude ./venv -r .
+          bandit --ini tox.ini --exclude ./venv -r .
           
       - name: SonarCloud scanner
         uses: sonarsource/sonarcloud-github-action@master
