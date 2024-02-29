@@ -4,15 +4,14 @@ svndumpfilterIN
 
 An implementation of Apache's svndumpfilter that solves some common problems.
 
-[![Build Status](https://travis-ci.org/jasperlee108/svndumpfilterIN.svg?branch=master)](https://travis-ci.org/jasperlee108/svndumpfilterIN)
 
 ## Requirements ##
 
+Latest version of svndumpfilterIN was updated on:
 
-svndumpfilterIN was developed on a Linux machine using
-
-  * Python 3.10.13
-  * nosetests version 1.1.2
+  * Python 3.9.18
+  * Pytest 8.0.0
+  * Ubuntu 20.04.06 LTS
 
 
 ##  Usage  ##
