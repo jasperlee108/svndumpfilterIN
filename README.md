@@ -107,9 +107,9 @@ To file issue reports, use the project's issue tracker on GitHub.
 When creating an issue, please provide a sample of the dump file that is creating the problem or provide a method to
 reproduce it.
 
-Patches are also welcome to the problems you encounter.
+PRs are also welcome to the problems you encounter.
 
-For development it is recommended use the following set up:
+### <u>For development it is recommended use the following set up:</u> ###
    1. Use python version 3.10.13
    2. Set up a virtual environment:
 
@@ -133,7 +133,14 @@ For development it is recommended use the following set up:
       See the [pycodestyle documentation](https://pycodestyle.pycqa.org/en/latest/)
       for more details.
 
-Prior to submitting a patch please:
+    5. Use Bandit to locate common secuity issues. To set up 
+       (once in your virtual environment):
+          % pip install bandit
+
+      See the [Bandit documentation](https://bandit.readthedocs.io/en/latest/)
+      for more details.
+
+### <u>Prior to submitting a PR please:</u> ###
    1. Check your changes adhere to style guidelines by ensuring
       the following passes with no complaints:
 
@@ -145,6 +152,19 @@ Prior to submitting a patch please:
 
           % py.test test_svndumpfilter.py
 
+   4. Ensure no security issues have been introduced using Bandit:
+
+          % bandit --ini tox.ini --exclude ./venv -r 
+
+### <u>GitHub actions:</u> ###
+
+   * The above prior requirements for submitting a PR will also be
+     checked by an equivalent set of GitHub actions
+
+### <u>Svndump format:</u> ###
+
+   * The most useful documentation on the [svndump format](https://svn.apache.org/repos/asf/subversion/trunk/notes/dump-load-format.txt) can be on the 
+     [Apache Subversion Server](https://svn.apache.org/)
 
 
 
