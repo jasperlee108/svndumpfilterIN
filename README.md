@@ -4,15 +4,14 @@ svndumpfilterIN
 
 An implementation of Apache's svndumpfilter that solves some common problems.
 
-[![Build Status](https://travis-ci.org/jasperlee108/svndumpfilterIN.svg?branch=master)](https://travis-ci.org/jasperlee108/svndumpfilterIN)
 
 ## Requirements ##
 
+Latest version of svndumpfilterIN was updated on:
 
-svndumpfilterIN was developed on a Linux machine using
-
-  * Python 2.6.6
-  * nosetests version 1.1.2
+  * Python 3.9.18
+  * Pytest 8.0.0
+  * Ubuntu 20.04.06 LTS
 
 
 ##  Usage  ##
@@ -28,12 +27,12 @@ target directory.
 
 Example Usage:
 
-    sudo python svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
+    sudo python3 svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
 
 Runs the svndumpfilter on `input_name.dump` from `repo_path` to carve out `directory_name`
 and save the result to `output_name.dump`.
 
-See also `python svndumpfilter.py --help`.
+See also `python3 svndumpfilter.py --help`.
 
 ## Implementation ##
 
@@ -108,36 +107,44 @@ To file issue reports, use the project's issue tracker on GitHub.
 When creating an issue, please provide a sample of the dump file that is creating the problem or provide a method to
 reproduce it.
 
-Patches are also welcome to the problems you encounter.
+PRs are also welcome to the problems you encounter.
 
-For development it is recommended use the following set up:
-   1. Use python version 2.7
+### <u>For development it is recommended use the following set up:</u> ###
+   1. Use python version 3.10.13
    2. Set up a virtual environment:
 
           % cd <your_git_workspace>
-          % virtualenv venv
+          % python3 -m venv venv
           % source venv/bin/activate
 
-      See http://docs.python-guide.org/en/latest/dev/virtualenvs/ for
-      more details.
+      See [Virtual Environment and Packages](https://docs.python.org/3/tutorial/venv.html)
+      for more details.
    3. Use pytest for running unit tests. To set up
       (once in your virutal environment):
 
           % pip install pytest
 
-      See http://doc.pytest.org/en/latest/ for more details.
-   4. Use pep8 for adherence to style guidelines. To set up
+      See the [pytest documentation](https://docs.pytest.org/en) for more details.
+   4. Use pycodestyle for adherence to style guidelines. To set up
       (once in your virutal environment):
 
-          % pip install pep8
+          % pip install pycodestyle
 
-      See https://pypi.python.org/pypi/pep8 for more details.
+      See the [pycodestyle documentation](https://pycodestyle.pycqa.org/en/latest/)
+      for more details.
 
-Prior to submitting a patch please:
+    5. Use Bandit to locate common secuity issues. To set up 
+       (once in your virtual environment):
+          % pip install bandit
+
+      See the [Bandit documentation](https://bandit.readthedocs.io/en/latest/)
+      for more details.
+
+### <u>Prior to submitting a PR please:</u> ###
    1. Check your changes adhere to style guidelines by ensuring
       the following passes with no complaints:
 
-          % pep8 svndumpfilter.py test_svndumpfilter.py
+          % pycodestyle *.py 
 
    2. Add unit test(s) to test_svndumpfilter.py demonstrating the
       problem and fix in your patch.
@@ -145,6 +152,19 @@ Prior to submitting a patch please:
 
           % py.test test_svndumpfilter.py
 
+   4. Ensure no security issues have been introduced using Bandit:
+
+          % bandit --ini tox.ini --exclude ./venv -r 
+
+### <u>GitHub actions:</u> ###
+
+   * The above prior requirements for submitting a PR will also be
+     checked by an equivalent set of GitHub actions
+
+### <u>Svndump format:</u> ###
+
+   * The most useful documentation on the [svndump format](https://svn.apache.org/repos/asf/subversion/trunk/notes/dump-load-format.txt) can be on the 
+     [Apache Subversion Server](https://svn.apache.org/)
 
 
 
