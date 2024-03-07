@@ -91,7 +91,7 @@ NODE_KIND = 'Node-kind'
 NODE_ACTION = 'Node-action'
 NODE_COPYFROM_PATH = 'Node-copyfrom-path'
 NODE_COPYFROM_REV = 'Node-copyfrom-rev'
-PROP_END = 'PROPS-END'
+PROP_END = b'PROPS-END'  # Use binary for matching against encoded lines
 SVN_MERGEINFO = 'svn:mergeinfo\n'
 
 
@@ -257,7 +257,8 @@ class Record(object):
             if self.type == 'Node' and self.head[NODE_ACTION] == 'delete':
                 write_empty_lines(d_file)
             else:
-                d_file.write('{}\n'.format(PROP_END).encode())
+                d_file.write(PROP_END)
+                write_empty_lines(d_file)
                 if self.type == 'Node':
                     if not self.body:
                         write_empty_lines(d_file)
