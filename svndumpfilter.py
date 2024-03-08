@@ -960,7 +960,7 @@ def main():
 
     parser = OptionParser(
         usage='%prog [OPTIONS] <input_dump> <SUBCOMMAND> [args]',
-        version='%prog 1.1')
+        version='%prog 2.0')
 
     parser.add_option('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
                       help='If filtering causes any revision to be empty (i.e. has no node records in that revision), \
