@@ -1,0 +1,1912 @@
+SVN-fs-dump-format-version: 3
+
+UUID: 6015fed2-1504-0410-9fe1-9d1591cc4771
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-10-27T05:41:27.534089Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 118
+Content-length: 118
+
+K 10
+svn:author
+V 6
+loewis
+K 8
+svn:date
+V 27
+2005-10-27T05:41:30.367139Z
+K 7
+svn:log
+V 17
+Conversion to SVN
+PROPS-END
+
+Revision-number: 2
+Prop-content-length: 112
+Content-length: 112
+
+K 8
+svn:date
+V 27
+2000-02-04T00:25:23.000000Z
+K 7
+svn:log
+V 38
+New repository initialized by cvs2svn.
+PROPS-END
+
+Revision-number: 3
+Prop-content-length: 253
+Content-length: 253
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-04T00:25:23.000000Z
+K 7
+svn:log
+V 150
+three files from the p2c cvs tree.  the message here indicates the
+revision number the p2c cvs tree.
+
+COPYRIGHT: 1.1
+ast.py: 1.3
+transformer.py: 1.11
+
+PROPS-END
+
+Revision-number: 4
+Prop-content-length: 358
+Content-length: 358
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-04T00:28:21.000000Z
+K 7
+svn:log
+V 255
+checking in initial weekend's work
+
+compile.py: ASTVisitor framework plus bits of a code generator that
+    should be bug-for-buf compatible with compile.c
+
+misc.py: Set and Stack helpers
+
+test.py: a bit of simple sample code that compile.py will work on
+
+PROPS-END
+
+Revision-number: 5
+Prop-content-length: 139
+Content-length: 139
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-04T19:34:47.000000Z
+K 7
+svn:log
+V 37
+add some other silliness to the test
+
+PROPS-END
+
+Revision-number: 6
+Prop-content-length: 270
+Content-length: 270
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-08T19:02:36.000000Z
+K 7
+svn:log
+V 167
+simple script that loads a pyc file and tries to print the contents of
+any code objects.  does *not* use import, so that invalid pyc files
+can be debugged (hopefully)
+
+PROPS-END
+
+Revision-number: 7
+Prop-content-length: 215
+Content-length: 215
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T00:43:52.000000Z
+K 7
+svn:log
+V 112
+add optional second arg that specific name of specific code object to
+dump; default is to dump all code objects
+
+PROPS-END
+
+Revision-number: 8
+Prop-content-length: 193
+Content-length: 193
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T00:48:05.000000Z
+K 7
+svn:log
+V 91
+compare standard interp output (generated via tests/gen_ouput.py) with
+our compiler output
+
+PROPS-END
+
+Revision-number: 9
+Prop-content-length: 281
+Content-length: 281
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T00:48:47.000000Z
+K 7
+svn:log
+V 178
+gen_output.py:
+    run this from the tests directory to produce output and bytecode
+    that can be compared to compile.py with test.py
+
+test_*.py:
+    add a bunch of test cases
+
+PROPS-END
+
+Revision-number: 10
+Prop-content-length: 120
+Content-length: 120
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T16:28:44.000000Z
+K 7
+svn:log
+V 18
+ignore .txt files
+
+PROPS-END
+
+Revision-number: 11
+Prop-content-length: 195
+Content-length: 195
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T17:34:12.000000Z
+K 7
+svn:log
+V 93
+add support for optional arguments -- specific tests to execute rather
+than whole test suite
+
+PROPS-END
+
+Revision-number: 12
+Prop-content-length: 121
+Content-length: 121
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-10T20:53:42.000000Z
+K 7
+svn:log
+V 19
+updated test suite
+
+PROPS-END
+
+Revision-number: 13
+Prop-content-length: 149
+Content-length: 149
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-12T00:09:37.000000Z
+K 7
+svn:log
+V 47
+two new test cases
+expanded test of func calls
+
+PROPS-END
+
+Revision-number: 14
+Prop-content-length: 117
+Content-length: 117
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-14T14:15:09.000000Z
+K 7
+svn:log
+V 15
+new test cases
+
+PROPS-END
+
+Revision-number: 15
+Prop-content-length: 152
+Content-length: 152
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-14T18:32:04.000000Z
+K 7
+svn:log
+V 50
+catch exceptions in imported modules and continue
+
+PROPS-END
+
+Revision-number: 16
+Prop-content-length: 217
+Content-length: 217
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-14T21:32:36.000000Z
+K 7
+svn:log
+V 114
+LeftShift & RightShift: fix reprs, change attr names to left and right
+(so they are common with other binary ops)
+
+PROPS-END
+
+Revision-number: 17
+Prop-content-length: 114
+Content-length: 114
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-14T21:52:26.000000Z
+K 7
+svn:log
+V 12
+placeholder
+
+PROPS-END
+
+Revision-number: 18
+Prop-content-length: 137
+Content-length: 137
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T21:46:33.000000Z
+K 7
+svn:log
+V 35
+catch the exception raised by exec
+
+PROPS-END
+
+Revision-number: 19
+Prop-content-length: 122
+Content-length: 122
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T21:49:03.000000Z
+K 7
+svn:log
+V 20
+exercise more cases
+
+PROPS-END
+
+Revision-number: 20
+Prop-content-length: 118
+Content-length: 118
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T21:50:58.000000Z
+K 7
+svn:log
+V 16
+silly test case
+
+PROPS-END
+
+Revision-number: 21
+Prop-content-length: 132
+Content-length: 132
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T22:08:16.000000Z
+K 7
+svn:log
+V 30
+no change -- testing syncmail
+
+PROPS-END
+
+Revision-number: 22
+Prop-content-length: 132
+Content-length: 132
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T22:09:02.000000Z
+K 7
+svn:log
+V 30
+no change -- testing syncmail
+
+PROPS-END
+
+Revision-number: 23
+Prop-content-length: 132
+Content-length: 132
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T22:10:33.000000Z
+K 7
+svn:log
+V 30
+no change -- testing syncmail
+
+PROPS-END
+
+Revision-number: 24
+Prop-content-length: 119
+Content-length: 119
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T23:43:35.000000Z
+K 7
+svn:log
+V 17
+test nested trys
+
+PROPS-END
+
+Revision-number: 25
+Prop-content-length: 117
+Content-length: 117
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-15T23:43:44.000000Z
+K 7
+svn:log
+V 15
+test sliceobjs
+
+PROPS-END
+
+Revision-number: 26
+Prop-content-length: 158
+Content-length: 158
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-16T00:52:04.000000Z
+K 7
+svn:log
+V 56
+add example with implicit tuple unpacking for arguments
+
+PROPS-END
+
+Revision-number: 27
+Prop-content-length: 139
+Content-length: 139
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-17T22:11:39.000000Z
+K 7
+svn:log
+V 37
+test some more variants of func defs
+
+PROPS-END
+
+Revision-number: 28
+Prop-content-length: 124
+Content-length: 124
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-02-17T22:11:53.000000Z
+K 7
+svn:log
+V 22
+test the del nonsense
+
+PROPS-END
+
+Revision-number: 29
+Prop-content-length: 119
+Content-length: 119
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-03-06T18:47:25.000000Z
+K 7
+svn:log
+V 17
+give it a main()
+
+PROPS-END
+
+Revision-number: 30
+Prop-content-length: 275
+Content-length: 275
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-05-02T22:29:46.000000Z
+K 7
+svn:log
+V 172
+patches from Mark Hammond
+
+compile.py:
+On Windows, use 'nul' instead of '/dev/null'.
+
+test.py:
+Use double-quotes for the command-line, as Windows doesnt recognise
+singles.
+
+PROPS-END
+
+Revision-number: 31
+Prop-content-length: 295
+Content-length: 295
+
+K 10
+svn:author
+V 7
+jhylton
+K 8
+svn:date
+V 27
+2000-05-02T22:34:01.000000Z
+K 7
+svn:log
+V 192
+patches from Mark Hammond
+
+Attached is a set of diffs for the .py compiler that adds support
+for the new extended call syntax.
+
+tests/test_func.py
+Added tests of the new extended call syntax.
+
+PROPS-END
+
+Revision-number: 32
+Prop-content-length: 156
+Content-length: 156
+
+K 10
+svn:author
+V 10
+gvanrossum
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 50
+removed trailing blank lines (really testing cvs)
+
+PROPS-END
+
+Revision-number: 33
+Prop-content-length: 155
+Content-length: 155
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 81
+This commit was manufactured by cvs2svn to create tag
+'after-descr-branch-merge'.
+PROPS-END
+
+Revision-number: 34
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-06'.
+PROPS-END
+
+Revision-number: 35
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-13'.
+PROPS-END
+
+Revision-number: 36
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-15'.
+PROPS-END
+
+Revision-number: 37
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-16'.
+PROPS-END
+
+Revision-number: 38
+Prop-content-length: 146
+Content-length: 146
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 72
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-17a'.
+PROPS-END
+
+Revision-number: 39
+Prop-content-length: 146
+Content-length: 146
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 72
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-17b'.
+PROPS-END
+
+Revision-number: 40
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-21'.
+PROPS-END
+
+Revision-number: 41
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-28'.
+PROPS-END
+
+Revision-number: 42
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-07-30'.
+PROPS-END
+
+Revision-number: 43
+Prop-content-length: 145
+Content-length: 145
+
+K 8
+svn:date
+V 27
+2000-05-18T00:08:34.000000Z
+K 7
+svn:log
+V 71
+This commit was manufactured by cvs2svn to create tag
+'date2001-08-01'.
+PROPS-END
+
+Revision-number: 44
+Prop-content-length: 118
+Content-length: 118
+
+K 10
+svn:author
+V 6
+loewis
+K 8
+svn:date
+V 27
+2005-10-27T05:41:39.130709Z
+K 7
+svn:log
+V 17
+Conversion to SVN
+PROPS-END
+
+Revision-number: 45
+Prop-content-length: 112
+Content-length: 112
+
+K 8
+svn:date
+V 27
+1998-11-20T21:38:37.000000Z
+K 7
+svn:log
+V 38
+New repository initialized by cvs2svn.
+PROPS-END
+
+Revision-number: 46
+Prop-content-length: 147
+Content-length: 147
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1998-11-20T21:38:37.000000Z
+K 7
+svn:log
+V 47
+Initial revision: proposal posted to meta-sig.
+
+PROPS-END
+
+Revision-number: 47
+Prop-content-length: 172
+Content-length: 172
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1998-11-25T22:58:10.000000Z
+K 7
+svn:log
+V 72
+Minor wording change.
+Added a bullet about recognizing SWIG extensions.
+
+PROPS-END
+
+Revision-number: 48
+Prop-content-length: 231
+Content-length: 231
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1998-12-18T21:08:55.000000Z
+K 7
+svn:log
+V 130
+Initial checkin of the Developer's Day material (proposal, presentation,
+and summary, including a pretty figure for the summary).
+
+PROPS-END
+
+Revision-number: 49
+Prop-content-length: 150
+Content-length: 150
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1998-12-18T22:01:20.000000Z
+K 7
+svn:log
+V 50
+Initial checkin of files in distutils test suite.
+
+PROPS-END
+
+Revision-number: 50
+Prop-content-length: 123
+Content-length: 123
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-01-11T04:06:01.000000Z
+K 7
+svn:log
+V 23
+Added design proposal.
+
+PROPS-END
+
+Revision-number: 51
+Prop-content-length: 260
+Content-length: 260
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-01-15T03:52:30.000000Z
+K 7
+svn:log
+V 159
+Commited myself to multiple commands on setup.py command line.
+Ditto for OO command modules (hence "command class").
+Various wording improvements, typo fixes.
+
+PROPS-END
+
+Revision-number: 52
+Prop-content-length: 260
+Content-length: 260
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-01-15T03:53:19.000000Z
+K 7
+svn:log
+V 159
+Toy program for messing around with getopt, to see if it'll
+cut the mustard for my proposed setup.py command-line syntax.
+(Conclusion: I don't think it will.)
+
+PROPS-END
+
+Revision-number: 53
+Prop-content-length: 127
+Content-length: 127
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-01-15T04:38:08.000000Z
+K 7
+svn:log
+V 27
+Tweaked a couple of tests.
+
+PROPS-END
+
+Revision-number: 54
+Prop-content-length: 110
+Content-length: 110
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-03-02T04:06:42.000000Z
+K 7
+svn:log
+V 10
+Typo fix.
+
+PROPS-END
+
+Revision-number: 55
+Prop-content-length: 426
+Content-length: 426
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-03-22T22:46:09.000000Z
+K 7
+svn:log
+V 325
+Setup script for the Distutils.  Actually serves two purposes:
+  * same as any setup script for any module distribution, ie.
+    describe the distribution enough so that the Distutils can
+    build and install it
+  * canonical example of a setup script for a multi-module, package-
+    using, pure Python module distribution
+
+PROPS-END
+
+Revision-number: 56
+Prop-content-length: 265
+Content-length: 265
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-07-10T02:06:02.000000Z
+K 7
+svn:log
+V 164
+Quick 'n dirty test script to lightly exercise a CCompiler subclass (such as
+UnixCCompiler) without requiring all the machinery of a Distutils 'build_ext' command.
+
+PROPS-END
+
+Revision-number: 57
+Prop-content-length: 166
+Content-length: 166
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-08-14T23:55:00.000000Z
+K 7
+svn:log
+V 66
+Pass dry_run and verbose values (both true!) to 'new_compiler()'.
+
+PROPS-END
+
+Revision-number: 58
+Prop-content-length: 223
+Content-length: 223
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-08-29T18:24:34.000000Z
+K 7
+svn:log
+V 122
+Patch from Perry Stoll:
+  - prettier output
+  - don't hardcode filename extensions (so we can use with
+    any CCompiler)
+
+PROPS-END
+
+Revision-number: 59
+Prop-content-length: 165
+Content-length: 165
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-12T20:42:48.000000Z
+K 7
+svn:log
+V 65
+Example setup.py for Numeric Python, as supplied by Perry Stoll.
+
+PROPS-END
+
+Revision-number: 60
+Prop-content-length: 126
+Content-length: 126
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T18:19:03.000000Z
+K 7
+svn:log
+V 26
+Renamed to numpy_setup.py
+
+PROPS-END
+
+Revision-number: 61
+Prop-content-length: 144
+Content-length: 144
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T18:19:31.000000Z
+K 7
+svn:log
+V 44
+Renamed and reformatted from numpysetup.py.
+
+PROPS-END
+
+Revision-number: 62
+Prop-content-length: 165
+Content-length: 165
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T18:20:09.000000Z
+K 7
+svn:log
+V 65
+More example setup.py files for well-known module distributions.
+
+PROPS-END
+
+Revision-number: 63
+Prop-content-length: 235
+Content-length: 235
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T18:44:08.000000Z
+K 7
+svn:log
+V 134
+Use the new 'packages' option instead of explicitly listing every bloody
+Distutils module (a list which was already way out-of-date).
+
+PROPS-END
+
+Revision-number: 64
+Prop-content-length: 122
+Content-length: 122
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T20:17:27.000000Z
+K 7
+svn:log
+V 22
+Fixed an include dir.
+
+PROPS-END
+
+Revision-number: 65
+Prop-content-length: 168
+Content-length: 168
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T20:22:47.000000Z
+K 7
+svn:log
+V 68
+[from 1999/04/03] Generate a snapshot of the Distutils source tree.
+
+PROPS-END
+
+Revision-number: 66
+Prop-content-length: 240
+Content-length: 240
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-21T20:36:48.000000Z
+K 7
+svn:log
+V 139
+Added a custom &find that's a bit fancier -- includes everything except
+build, dd, www, CVS directories and .py[co] files and emacs turds.
+
+PROPS-END
+
+Revision-number: 67
+Prop-content-length: 138
+Content-length: 138
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:43:23.000000Z
+K 7
+svn:log
+V 38
+Basic instructions for the Distutils.
+
+PROPS-END
+
+Revision-number: 68
+Prop-content-length: 147
+Content-length: 147
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:43:48.000000Z
+K 7
+svn:log
+V 47
+Detailed usage instructions for the Distutils.
+
+PROPS-END
+
+Revision-number: 69
+Prop-content-length: 168
+Content-length: 168
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:44:28.000000Z
+K 7
+svn:log
+V 68
+Instructions for which files to ship in the Distutils distribution.
+
+PROPS-END
+
+Revision-number: 70
+Prop-content-length: 208
+Content-length: 208
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:45:31.000000Z
+K 7
+svn:log
+V 107
+Changed meta-info: new name and version, 'author' split into 'author' and 'author_email'.
+Updated comment.
+
+PROPS-END
+
+Revision-number: 71
+Prop-content-length: 145
+Content-length: 145
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:46:24.000000Z
+K 7
+svn:log
+V 45
+Info on the Distutils example setup scripts.
+
+PROPS-END
+
+Revision-number: 72
+Prop-content-length: 111
+Content-length: 111
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:48:18.000000Z
+K 7
+svn:log
+V 11
+Added URL.
+
+PROPS-END
+
+Revision-number: 73
+Prop-content-length: 121
+Content-length: 121
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T01:48:36.000000Z
+K 7
+svn:log
+V 21
+Added email and url.
+
+PROPS-END
+
+Revision-number: 74
+Prop-content-length: 211
+Content-length: 211
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T12:08:20.000000Z
+K 7
+svn:log
+V 110
+Deleted all 'def_file' entries in the build_info hashes.
+Comment revision.
+Added maintainer/maintainer_email.
+
+PROPS-END
+
+Revision-number: 75
+Prop-content-length: 161
+Content-length: 161
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T13:10:02.000000Z
+K 7
+svn:log
+V 61
+[from 1999/03/03]
+Test script for the 'fancy_getopt' module.
+
+PROPS-END
+
+Revision-number: 76
+Prop-content-length: 154
+Content-length: 154
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T13:10:23.000000Z
+K 7
+svn:log
+V 54
+[from 1999/07/24]
+Test script for the 'spawn' module.
+
+PROPS-END
+
+Revision-number: 77
+Prop-content-length: 166
+Content-length: 166
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T13:11:36.000000Z
+K 7
+svn:log
+V 66
+Template so developers can easily create their own setup scripts.
+
+PROPS-END
+
+Revision-number: 78
+Prop-content-length: 140
+Content-length: 140
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-09-29T13:14:06.000000Z
+K 7
+svn:log
+V 40
+Added paragraph on "template_setup.py".
+
+PROPS-END
+
+Revision-number: 79
+Prop-content-length: 144
+Content-length: 144
+
+K 8
+svn:date
+V 27
+1999-09-29T13:14:06.000000Z
+K 7
+svn:log
+V 70
+This commit was manufactured by cvs2svn to create tag
+'Distutils-0_1'.
+PROPS-END
+
+Revision-number: 80
+Prop-content-length: 187
+Content-length: 187
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-03T21:10:02.000000Z
+K 7
+svn:log
+V 87
+Changed to give directory for 'Imaging' library, to test/demonstrate
+that new feature.
+
+PROPS-END
+
+Revision-number: 81
+Prop-content-length: 120
+Content-length: 120
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-03T21:10:29.000000Z
+K 7
+svn:log
+V 20
+Ditched 'def_file'.
+
+PROPS-END
+
+Revision-number: 82
+Prop-content-length: 170
+Content-length: 170
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-23T19:07:48.000000Z
+K 7
+svn:log
+V 70
+[from 1999/10/03]
+Skip directories, .pyc/.pyo files, and Emacs turds.
+
+PROPS-END
+
+Revision-number: 83
+Prop-content-length: 122
+Content-length: 122
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-23T20:18:21.000000Z
+K 7
+svn:log
+V 22
+Distutils change log.
+
+PROPS-END
+
+Revision-number: 84
+Prop-content-length: 158
+Content-length: 158
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-23T20:19:16.000000Z
+K 7
+svn:log
+V 58
+Update for release 0.1.1: change version number and date.
+
+PROPS-END
+
+Revision-number: 85
+Prop-content-length: 118
+Content-length: 118
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-10-23T20:34:45.000000Z
+K 7
+svn:log
+V 18
+Added change log.
+
+PROPS-END
+
+Revision-number: 86
+Prop-content-length: 146
+Content-length: 146
+
+K 8
+svn:date
+V 27
+1999-10-23T20:34:45.000000Z
+K 7
+svn:log
+V 72
+This commit was manufactured by cvs2svn to create tag
+'Distutils-0_1_1'.
+PROPS-END
+
+Revision-number: 87
+Prop-content-length: 129
+Content-length: 129
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-12T23:16:40.000000Z
+K 7
+svn:log
+V 29
+Removed -- no longer needed.
+
+PROPS-END
+
+Revision-number: 88
+Prop-content-length: 185
+Content-length: 185
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-12T23:17:42.000000Z
+K 7
+svn:log
+V 85
+[from 1999/03/03]
+Test script for fancy_getopt -- somehow this never got checked in.
+
+PROPS-END
+
+Revision-number: 89
+Prop-content-length: 135
+Content-length: 135
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-13T21:39:25.000000Z
+K 7
+svn:log
+V 35
+Bumped version number to 0.1.2pre.
+
+PROPS-END
+
+Revision-number: 90
+Prop-content-length: 144
+Content-length: 144
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T00:41:08.000000Z
+K 7
+svn:log
+V 44
+Reformatted.
+Added entry for release 0.1.2.
+
+PROPS-END
+
+Revision-number: 91
+Prop-content-length: 119
+Content-length: 119
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T00:50:06.000000Z
+K 7
+svn:log
+V 19
+Updated for 0.1.2.
+
+PROPS-END
+
+Revision-number: 92
+Prop-content-length: 212
+Content-length: 212
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T00:54:21.000000Z
+K 7
+svn:log
+V 111
+Sample module distribution #1: single module in root package, specified
+in the setup script with 'py_modules'.
+
+PROPS-END
+
+Revision-number: 93
+Prop-content-length: 265
+Content-length: 265
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T00:55:13.000000Z
+K 7
+svn:log
+V 164
+Sample module distribution #2 (setup script only -- the "code" is the same):
+single module in root package, specified implicitly in the setup script
+by 'packages'.
+
+PROPS-END
+
+Revision-number: 94
+Prop-content-length: 145
+Content-length: 145
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T01:12:33.000000Z
+K 7
+svn:log
+V 45
+Copy of sample.py from sample1 distribution.
+
+PROPS-END
+
+Revision-number: 95
+Prop-content-length: 149
+Content-length: 149
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T01:13:05.000000Z
+K 7
+svn:log
+V 49
+Added so the whole release is under CVS control.
+
+PROPS-END
+
+Revision-number: 96
+Prop-content-length: 125
+Content-length: 125
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+1999-12-16T01:13:41.000000Z
+K 7
+svn:log
+V 25
+Bumped version to 0.1.2.
+
+PROPS-END
+
+Revision-number: 97
+Prop-content-length: 146
+Content-length: 146
+
+K 8
+svn:date
+V 27
+1999-12-16T01:13:41.000000Z
+K 7
+svn:log
+V 72
+This commit was manufactured by cvs2svn to create tag
+'Distutils-0_1_2'.
+PROPS-END
+
+Revision-number: 98
+Prop-content-length: 172
+Content-length: 172
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+2000-01-17T17:19:18.000000Z
+K 7
+svn:log
+V 72
+Oops: in the 'dist' command, -f is no longer shorthand for '--formats'.
+
+PROPS-END
+
+Revision-number: 99
+Prop-content-length: 159
+Content-length: 159
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+2000-01-30T15:38:08.000000Z
+K 7
+svn:log
+V 59
+Updated to look like the real Numerical 15.2 setup script.
+
+PROPS-END
+
+Revision-number: 100
+Prop-content-length: 140
+Content-length: 140
+
+K 10
+svn:author
+V 5
+gward
+K 8
+svn:date
+V 27
+2000-01-30T15:42:53.000000Z
+K 7
+svn:log
+V 40
+Added "of historical interest" comment.
+
+PROPS-END
+
