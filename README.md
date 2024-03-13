@@ -150,7 +150,7 @@ PRs are also welcome to the problems you encounter.
       problem and fix in your patch.
    3. Ensure all unit tests pass using pytest:
 
-          % py.test test_svndumpfilter.py
+          % pytest test
 
    4. Ensure no security issues have been introduced using Bandit:
 
