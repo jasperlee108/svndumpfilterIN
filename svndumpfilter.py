@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from optparse import OptionParser
+from argparse import ArgumentParser
+from argparse import REMAINDER as argparse_remainder
 from tempfile import TemporaryFile
 import os
 import pprint
@@ -959,48 +960,50 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
 
 def main():
 
-    parser = OptionParser(
-        usage='%prog [OPTIONS] <input_dump> <SUBCOMMAND> [args]',
-        version='%prog 2.0')
+    parser = ArgumentParser(
+        usage='%(prog)s [OPTIONS] <input_dump> <SUBCOMMAND> [args]',
+        epilog='Version 2.0')
 
-    parser.add_option('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
-                      help='If filtering causes any revision to be empty (i.e. has no node records in that revision), \
-                  still keep the revision in the final dump file.')
+    parser.add_argument('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
+                        help='If filtering causes any revision to be empty (i.e. has no node records in that revision), \
+                        still keep the revision in the final dump file.')
 
-    parser.add_option('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
-                      help="Don't renumber revisions that remain after filtering.")
+    parser.add_argument('-s', '--stop-renumber-revs', dest='renumber_revs', action='store_false', default=True,
+                        help="Don't renumber revisions that remain after filtering.")
 
-    parser.add_option('-x', '--strip-mergeinfo', dest='strip_merge', action='store_true', default=False,
-                      help="Remove svn:mergeinfo properties.")
+    parser.add_argument('-x', '--strip-mergeinfo', dest='strip_merge', action='store_true', default=False,
+                        help="Remove svn:mergeinfo properties.")
 
-    parser.add_option('-q', '--quiet', dest='quiet', action='store_true', default=False,
-                      help='Does not display filtering statistics.')
+    parser.add_argument('-q', '--quiet', dest='quiet', action='store_true', default=False,
+                        help='Does not display filtering statistics.')
 
-    parser.add_option('-n', '--revisions', dest='start_revision',
-                      help='Starts filtering at a specified revision and ends at the last revision in the input dump file.')
+    parser.add_argument('-n', '--revisions', dest='start_revision',
+                        help='Starts filtering at a specified revision and ends at the last revision in the input dump file.')
 
-    parser.add_option('-c', '--scan-only', dest='scan', action='store_true', default=False,
-                      help='Scans the dumpfile to see if untangling is necessary.')
+    parser.add_argument('-c', '--scan-only', dest='scan', action='store_true', default=False,
+                        help='Scans the dumpfile to see if untangling is necessary.')
 
-    parser.add_option('-f', '--paths-file', dest='file',
-                      help='Specifies the file to read matched paths from.')
+    parser.add_argument('-f', '--paths-file', dest='file',
+                        help='Specifies the file to read matched paths from.')
 
-    parser.add_option('-r', '--repo', dest='repo',
-                      help='Specify a repository. This is mandatory when not scanning.')
+    parser.add_argument('-r', '--repo', dest='repo',
+                        help='Specify a repository. This is mandatory when not scanning.')
 
-    parser.add_option('-d', '--debug', dest='debug', action='store_true', default=False,
-                      help='Turns on debug statements.')
+    parser.add_argument('-d', '--debug', dest='debug', action='store_true', default=False,
+                        help='Turns on debug statements.')
 
-    parser.add_option('-o', '--output-dump', dest='output_dump',
-                      help='Specify an output dump file. This is mandatory when not scanning')
+    parser.add_argument('-o', '--output-dump', dest='output_dump',
+                        help='Specify an output dump file. This is mandatory when not scanning')
 
-    (opt, args) = parser.parse_args()
+    parser.add_argument('args', nargs=argparse_remainder)
+
+    opt = parser.parse_args()
 
     if not opt.file:
-        if len(args) < 3:
+        if len(opt.args) < 3:
             parser.error('You must specify a input_dump, a sub-command, and arguments.')
     else:
-        if len(args) < 2:
+        if len(opt.args) < 2:
             parser.error('When specifying a file, you must provide an input_dump and a sub-command')
 
     if not opt.scan:
@@ -1009,8 +1012,8 @@ def main():
         elif not opt.output_dump:
             parser.error('When not scanning, you must specify a path to the output dump file.')
 
-    input_dump = args[0]
-    subcommand = args[1]
+    input_dump = opt.args[0]
+    subcommand = opt.args[1]
 
     if subcommand == 'include':
         include = True
@@ -1019,7 +1022,7 @@ def main():
     else:
         parser.error('Unrecognized subcommand : Must use either \'include\' or \'exclude\'')
 
-    matches = args[2:]
+    matches = opt.args[2:]
 
     parse_dump(input_dump, opt.output_dump, matches, include, opt)
 
