@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from difflib import diff_bytes, unified_diff
-import os
+from pathlib import Path, PurePath
 from tempfile import NamedTemporaryFile
 import unittest
 
@@ -22,7 +22,7 @@ class ParseDumpTestCase(unittest.TestCase):
         debug: bool = False
 
     # Directory location of test dumpfiles and expected filtered dump files
-    DUMPFILE_DIRECTORY = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data')
+    DUMPFILE_DIRECTORY = PurePath(Path(__file__).resolve().parent, 'data')
 
     def setUp(self):
         super().setUp()
@@ -51,8 +51,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_only_empty_revisions_removed(self):
         """ Test filtering dump file with only empty revisions removes them """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_removed_filtered_dump')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_removed_filtered_dump')
         opt = self.OPTIONS()
 
         with NamedTemporaryFile() as filtered_output_file:
@@ -62,8 +62,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_only_empty_revisions_preserved(self):
         """ Test filtering dump file with only empty revisions preserving them """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_preserved_filtered_dump')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_preserved_filtered_dump')
         opt = self.OPTIONS()
         opt.drop_empty = False
 
@@ -74,8 +74,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_only_empty_revisions_preserved_stop_renumbering(self):
         """ Test filtering dump file with only empty revisions preserving them and stop re-numbering"""
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_preserved_stop_renumbering_filtered_dump')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_empty_revs_preserved_stop_renumbering_filtered_dump')
         opt = self.OPTIONS()
         opt.drop_empty = False
         opt.renumber_revs = False
@@ -87,8 +87,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_non_existing_excluded_node_empty_with_revisions_removed(self):
         """ Test filtering dump file with nodes and empty revisions, exclude non-existing node, remove empty revisions """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_non_existing_node_excluded_empty_revs_removed')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_non_existing_node_excluded_empty_revs_removed')
         opt = self.OPTIONS()
 
         with NamedTemporaryFile() as filtered_output_file:
@@ -98,8 +98,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_non_existing_excluded_node_empty_with_revisions_preserved(self):
         """ Test filtering dump file with nodes and empty revisions, exclude non-existing node, preserve empty revisions """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_non_existing_node_excluded_empty_revs_preserved')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_non_existing_node_excluded_empty_revs_preserved')
         opt = self.OPTIONS()
         opt.drop_empty = False
 
@@ -110,8 +110,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_existing_excluded_node_empty_with_revisions_removed(self):
         """ Test filtering dump file with nodes and empty revisions, exclude existing node, remove empty revisions """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_existing_node_excluded_empty_revs_removed')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_existing_node_excluded_empty_revs_removed')
         opt = self.OPTIONS()
 
         with NamedTemporaryFile() as filtered_output_file:
@@ -121,8 +121,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_existing_included_node_empty_with_revisions_removed(self):
         """ Test filtering dump file with nodes and empty revisions, include existing node, remove empty revisions """
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_existing_node_included_empty_revs_removed')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_existing_node_included_empty_revs_removed')
         opt = self.OPTIONS()
 
         with NamedTemporaryFile() as filtered_output_file:
@@ -132,8 +132,8 @@ class ParseDumpTestCase(unittest.TestCase):
 
     def test_merginfo_properties_removal_no_renumbering(self):
         """ Test filtering dump file with to ensure mergeinfo properties are removed and stop renumbering"""
-        input_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'test_mergeinfo_dump')
-        expected_filtered_dumpfile = os.path.join(self.DUMPFILE_DIRECTORY, 'expected_mergeinfo_removed_no_renumber')
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_mergeinfo_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_mergeinfo_removed_no_renumber')
         opt = self.OPTIONS()
         opt.strip_merge = True
         opt.renumber_revs = False
