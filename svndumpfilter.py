@@ -2,12 +2,13 @@
 
 from argparse import ArgumentParser
 from argparse import REMAINDER as argparse_remainder
-from tempfile import TemporaryFile
 import os
+from pathlib import Path
 import pprint
 import re
 import subprocess
 import sys
+from tempfile import TemporaryFile
 import time
 
 
@@ -697,7 +698,7 @@ def clean_up(filename):
     Remove the old dump file so a new one with the same filename can replace it.
     """
     try:
-        os.remove(filename)
+        Path(filename).unlink()
     except OSError:
         pass
 
