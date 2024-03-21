@@ -86,7 +86,7 @@ jobs:
       - name: Run Pycodestyle
         run: |
           source venv/bin/activate
-          pycodestyle *.py
+          pycodestyle *.py test/*.py
           
       - name: Run Unit Tests
         run: |
