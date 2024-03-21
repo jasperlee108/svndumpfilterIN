@@ -118,8 +118,19 @@ class svndump_file():
     def readline(self):
         """ Semantics of readline() to read and return a textual line from the file. """
         if self.read_buffer == b'':
-            return ''
-        text_line, new_buffer = self.read_buffer.split(b'\n', maxsplit=1)
+            # Ensure the file is exhausted, not just at the end of the read buffer
+            self._read_new_buffer()
+            if len(self.read_buffer) == 0:
+                return ''
+        try:
+            text_line, new_buffer = self.read_buffer.split(b'\n', maxsplit=1)
+        except ValueError:
+            # This can occur when at the end of the read buffer which has no new line. Need to
+            # concat current contents to a new read buffer split at a new line
+            first_part = self.read_buffer
+            self._read_new_buffer()
+            second_part, new_buffer = self.read_buffer.split(b'\n', maxsplit=1)
+            text_line = first_part + second_part
         if new_buffer == []:
             self._read_new_buffer()
         else:
@@ -129,21 +140,24 @@ class svndump_file():
     def read(self, bytes_to_read):
         """ Semantics of read() to read and return the passed number of bytes from the file. """
         byte_line = bytearray(bytes_to_read + 1)
-        read_buffer_size = len(self.read_buffer)
-        if read_buffer_size > bytes_to_read:
-            byte_line = self.read_buffer[0:bytes_to_read]
-            self.read_buffer = self.read_buffer[bytes_to_read:]
-        elif read_buffer_size == bytes_to_read:
-            byte_line = self.read_buffer
-            self._read_new_buffer()
-        else:
-            first_part_size = read_buffer_size
-            first_part = self.read_buffer
-            self._read_new_buffer()
-            second_part_size = bytes_to_read - first_part_size
-            second_part = self.read_buffer[0:second_part_size]
-            byte_line = first_part + second_part
-            self.read_buffer = self.read_buffer[second_part_size:]
+        incomplete = True
+        bytes_left_to_read = bytes_to_read
+        while incomplete:
+            read_buffer_size = len(self.read_buffer)
+            slice_start = bytes_to_read - bytes_left_to_read
+            if read_buffer_size > bytes_left_to_read:
+                byte_line[slice_start:] = self.read_buffer[0:bytes_left_to_read]
+                self.read_buffer = self.read_buffer[bytes_left_to_read:]
+                incomplete = False
+            elif read_buffer_size == bytes_left_to_read:
+                byte_line[slice_start:] = self.read_buffer
+                self._read_new_buffer()
+                incomplete = False
+            else:
+                slice_start = bytes_to_read - bytes_left_to_read
+                byte_line[slice_start: slice_start + read_buffer_size] = self.read_buffer[0:]
+                bytes_left_to_read -= read_buffer_size
+                self._read_new_buffer()
 
         return byte_line
 
@@ -162,7 +176,7 @@ def encode_to_fs(name):
     """
     Converts the utf-8 name to the file system encoding
     """
-    return name.decode('utf-8').encode(sys.getfilesystemencoding())
+    return name.encode(sys.getfilesystemencoding())
 
 
 def decode_from_fs(filename):
@@ -379,7 +393,7 @@ class Record(object):
         """
          Extract the body of a record from a dump file.
         """
-        if TEXT_CONTENT_LEN in self.head and self.head[TEXT_CONTENT_LEN] > 10:
+        if TEXT_CONTENT_LEN in self.head:
             self.body = d_file.read(int(self.head[TEXT_CONTENT_LEN]))
 
     def extract_segment(self, d_file):
@@ -526,13 +540,13 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     file_path = encode_to_fs(file_path)
     command_list = ['svnlook']
     if filtering:  # svn tree
-        command_list.extend([filtering, '-r', rev_num, command, repo_path, file_path])
+        command_list.extend([filtering, '-r', str(rev_num), command, repo_path, file_path.decode()])
     else:  # svn cat
-        command_list.extend(['-r', rev_num, command, repo_path, file_path])
+        command_list.extend(['-r', str(rev_num), command, repo_path, file_path.decode()])
     if debug:
         print(command_list)
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
-        process = subprocess.Popen(command_list, stdout=stdout_temp_file, stderr=stderr_temp_file)  # nosec B603
+        process = subprocess.Popen(' '.join(command_list), shell=True, stdout=stdout_temp_file, stderr=stderr_temp_file)  # nosec B602
         exit_code = process.wait()
         if exit_code:
             stderr_temp_file.flush()
@@ -578,8 +592,8 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
         elif transfer_file == from_path + '/':
             add_dir_to_dump(d_file, destination, dump_version)
         else:
-            file_from = from_path + '/' + transfer_file[len(from_path) + 1:]
-            file_dest = destination + '/' + transfer_file[len(from_path) + 1:]
+            file_from = from_path + '/' + transfer_file[len(from_path) + 1:].decode()
+            file_dest = destination + '/' + transfer_file[len(from_path) + 1:].decode()
             handle_missing_file(d_file, file_from, file_dest, rev_num, repo_path, dump_version, debug)
 
 
