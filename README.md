@@ -144,7 +144,7 @@ PRs are also welcome to the problems you encounter.
    1. Check your changes adhere to style guidelines by ensuring
       the following passes with no complaints:
 
-          % pycodestyle *.py 
+          % pycodestyle *.py test/*.py
 
    2. Add unit test(s) to test_svndumpfilter.py demonstrating the
       problem and fix in your patch.
