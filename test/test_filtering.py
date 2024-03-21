@@ -142,3 +142,15 @@ class ParseDumpTestCase(unittest.TestCase):
             parse_dump(input_dumpfile, filtered_output_file.name, ['foo'], False, opt)
             diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
         self.assertEqual(b'', diff)
+
+    def test_large_binary_file_include(self):
+        """ Test correctly including large files (greater then the read buffer) and filtering others """
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_include_large_file_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_include_large_file_dump')
+        opt = self.OPTIONS()
+
+        with NamedTemporaryFile() as filtered_output_file:
+            parse_dump(input_dumpfile, filtered_output_file.name, ['python/trunk/Include'], True, opt)
+            diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
+        print(diff)
+        self.assertEqual(b'', diff)
