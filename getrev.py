@@ -23,11 +23,11 @@ def main():
             if in_revision:
                 if binary:
                     buffer.append((binary, line))
-                elif line.startswith('Revision'):
+                elif line.startswith('Revision-number:'):
                     break
                 else:
                     buffer.append((binary, line))
-            if not binary and line.startswith('Revision'):
+            if not binary and line.startswith('Revision-number:'):
                 if line.startswith(revision_locator):
                     buffer.append((binary, line))
                     in_revision = True

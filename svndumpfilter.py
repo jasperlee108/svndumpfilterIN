@@ -546,13 +546,13 @@ def run_svnlook_command(command, rev_num, repo_path, file_path, filtering, debug
     if debug:
         print(command_list)
     with TemporaryFile() as stdout_temp_file, TemporaryFile() as stderr_temp_file:
-        process = subprocess.Popen(' '.join(command_list), shell=True, stdout=stdout_temp_file, stderr=stderr_temp_file)  # nosec B602
+        process = subprocess.Popen(command_list, shell=False, stdout=stdout_temp_file, stderr=stderr_temp_file)  # nosec B603
         exit_code = process.wait()
         if exit_code:
             stderr_temp_file.flush()
             stderr_temp_file.seek(0)
             error_msg = stderr_temp_file.read()
-            raise SVNLookError(error_msg)
+            raise SVNLookError('Command: {}\n'.format(command_list) + error_msg.decode())
         else:
             stdout_temp_file.flush()
             stdout_temp_file.seek(0)
@@ -586,14 +586,14 @@ def handle_missing_directory(d_file, from_path, destination, rev_num, repo_path,
     output = output.splitlines()
     files = [a for a in output if a != ' ' and a != '']
     for transfer_file in files:
-        transfer_file = decode_from_fs(transfer_file)
+        transfer_file = decode_from_fs(transfer_file).decode()
         if transfer_file[-1] == '/':
             add_dir_to_dump(d_file, destination + '/' + transfer_file[len(from_path) + 1:], dump_version)
         elif transfer_file == from_path + '/':
             add_dir_to_dump(d_file, destination, dump_version)
         else:
-            file_from = from_path + '/' + transfer_file[len(from_path) + 1:].decode()
-            file_dest = destination + '/' + transfer_file[len(from_path) + 1:].decode()
+            file_from = from_path + '/' + transfer_file[len(from_path) + 1:]
+            file_dest = destination + '/' + transfer_file[len(from_path) + 1:]
             handle_missing_file(d_file, file_from, file_dest, rev_num, repo_path, dump_version, debug)
 
 
