@@ -823,6 +823,8 @@ def write_included(rev_map, node_seg, flags, opt, untangled=False):
     if opt.renumber_revs:
         if NODE_COPYFROM_REV in node_seg.head and not untangled:
             orig_copy_rev = node_seg.head[NODE_COPYFROM_REV]
+            if isinstance(orig_copy_rev, int):
+                orig_copy_rev = str(orig_copy_rev)
             new_copy_rev = rev_map[orig_copy_rev]
             next = str(int(orig_copy_rev) + 1)
             print('>>setting new_copy_rev: {0}'.format(new_copy_rev))
