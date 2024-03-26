@@ -154,3 +154,15 @@ class ParseDumpTestCase(unittest.TestCase):
             diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
         print(diff)
         self.assertEqual(b'', diff)
+
+    def test_empty_revs_message(self):
+        """ Test correctly filtering empty revs with a custom message """
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_existing_node_excluded_empty_revs_message')
+        opt = self.OPTIONS()
+
+        opt.renumber_revs = False
+        with NamedTemporaryFile() as filtered_output_file:
+            parse_dump(input_dumpfile, filtered_output_file.name, ['python/trunk/Doc/README'], False, opt)
+            diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
+        self.assertEqual(b'', diff)
