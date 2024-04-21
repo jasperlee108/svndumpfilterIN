@@ -324,7 +324,7 @@ class Record(object):
         """
         Removes whitespace lines until reaching a line without whitespace. Remains at the line
         without whitespace when finishing.
-        """
+       """
         pos = d_file.tell()
         line = d_file.readline()
         while line == '\n' or line.startswith('* Dumped revision '):
@@ -418,6 +418,14 @@ class Record(object):
                 break
         if insert:
             self.order_head.insert(0, (key, value))
+
+    def update_new_props(self, new_props):
+        """
+        Update to a new list of properties
+        """
+        self.order_prop.clear()
+        for kv in new_props:
+            self.order_prop.append(kv)
 
     def __repr__(self):
         original = super(Record, self).__repr__()
@@ -814,6 +822,38 @@ def handle_include_to_exclude(output_file, flags, opt):
     flags['included'] = False
 
 
+def check_revision_empty(flags):
+    """
+    Check if we have a revision made empty by the exclusion of node records
+    """
+    still_have_node_records = False
+    for segment in flags['to_write']:
+        if NODE_PATH in segment.head:
+            still_have_node_records = True
+            break
+    return not still_have_node_records
+
+
+def update_to_empty_revision(flags, message):
+    """"
+    A revision has been empty by path exclusions and we have a custom message to log in this case
+    """
+    # there should only be one record to write, the revision
+    assert len(flags['to_write']) == 1
+
+    # Rewrite the properties of an empty revision to only have the origina date and a new log message
+    for i, kv in enumerate(flags['to_write'][0].order_prop):
+        if kv[1].startswith('svn:date'):
+            new_prop = flags['to_write'][0].order_prop[i:i + 2]
+    flags['to_write'][0].update_new_props(new_prop)
+    message_len = len(message)
+    flags['to_write'][0]._add_property('K 7\n', 'svn:log\n')
+    flags['to_write'][0]._add_property('K {}\n'.format(message_len), '{}\n'.format(message))
+
+    # Now compute the new property content and content length
+    update_prop_len(flags['to_write'][0])
+
+
 def write_included(rev_map, node_seg, flags, opt, untangled=False):
     """
     Optionally map the current revision to a renumbered revision for the node record. Include the record to be written.
@@ -857,6 +897,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
         'did_increment': None,                    # Prevents multiple increments for 1 revision
         'to_write': [],                           # List of items to write
         'included': False,                        # to_write list must be written
+        'nodes_excluded': False,                  # indicates a node was excluded; used to compute empty revisions
     }
 
     print('Starting to filter dumpfile : {} '.format(input_dump))
@@ -880,6 +921,7 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                     print('---- Working on Input Revision {} (Renumber Rev: {}) ----'.format(flags['orig_rev'], flags['renum_rev']))
                 flags['to_write'] = []
                 flags['included'] = False
+                flags['nodes_excluded'] = False
                 if not flags['next_rev']:  # This is the first revision (rev 0).
                     rev_seg = Record(dump_format=dump_version)
                     rev_seg.extract_segment(input_file)
@@ -946,6 +988,15 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                                         write_included(rev_map, node_seg, flags, opt)
                                 else:
                                     write_included(rev_map, node_seg, flags, opt)
+                            else:
+                                flags['nodes_excluded'] = True
+
+                if flags['nodes_excluded'] and opt.empty_rev_message is not None:
+                    empty_revision = check_revision_empty(flags)
+                    if empty_revision:
+                        update_to_empty_revision(flags, opt.empty_rev_message)
+                        if debug:
+                            print('Found revision made empty by node exclusions')
                 if flags['can_write'] and not flags['included']:
                     # Adding revision to skipped revs set unless untangled
                     if flags['untangled']:
@@ -970,6 +1021,12 @@ def parse_dump(input_dump, output_dump, matches, include, opt):
                     pprint.pprint(flags)
         except FinishedFiltering:
             if not opt.scan:
+                if flags['nodes_excluded'] and opt.empty_rev_message is not None:
+                    empty_revision = check_revision_empty(flags)
+                    if empty_revision:
+                        update_to_empty_revision(flags, opt.empty_rev_message)
+                        if debug:
+                            print('Found revision made empty by node exclusions')
                 write_segments(output_file, flags['to_write'])
                 print('Filtering Complete : from {} to {}'.format(input_dump, output_dump))
         print_scan_results(opt.scan, flags['safe'])
@@ -979,7 +1036,7 @@ def main():
 
     parser = ArgumentParser(
         usage='%(prog)s [OPTIONS] <input_dump> <SUBCOMMAND> [args]',
-        epilog='Version 2.0')
+        epilog='Version 2.1')
 
     parser.add_argument('-k', '--keep-empty-revs', dest='drop_empty', action='store_false', default=True,
                         help='If filtering causes any revision to be empty (i.e. has no node records in that revision), \
@@ -1012,6 +1069,10 @@ def main():
     parser.add_argument('-o', '--output-dump', dest='output_dump',
                         help='Specify an output dump file. This is mandatory when not scanning')
 
+    parser.add_argument('-m', '--empty-rev-message', dest='empty_rev_message', action='store', default=None,
+                        help='When specified and a revision is made empty by filtering, this becomes the revision message.'
+                             ' This cannot be used with --keep-empty-revs.')
+
     parser.add_argument('args', nargs=argparse_remainder)
 
     opt = parser.parse_args()
@@ -1028,6 +1089,9 @@ def main():
             parser.error('When not scanning, you must specify a path to the dump file\'s repository.')
         elif not opt.output_dump:
             parser.error('When not scanning, you must specify a path to the output dump file.')
+
+    if opt.empty_rev_message is not None and not opt.drop_empty:
+        parser.error('You cannot specify both --empty-rev-message and --keep-empty-revs.')
 
     input_dump = opt.args[0]
     subcommand = opt.args[1]

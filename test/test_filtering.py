@@ -20,6 +20,7 @@ class ParseDumpTestCase(unittest.TestCase):
         file: str = None
         repo: str = '../repos/python'
         debug: bool = False
+        empty_rev_message = None
 
     # Directory location of test dumpfiles and expected filtered dump files
     DUMPFILE_DIRECTORY = PurePath(Path(__file__).resolve().parent, 'data')
@@ -152,5 +153,18 @@ class ParseDumpTestCase(unittest.TestCase):
         with NamedTemporaryFile() as filtered_output_file:
             parse_dump(input_dumpfile, filtered_output_file.name, ['python/trunk/Include'], True, opt)
             diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
-        print(diff)
+        self.assertEqual(b'', diff)
+
+    def test_empty_revs_message(self):
+        """ Test correctly filtering empty revs with a custom message """
+        input_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'test_nodes_empty_revs_dump')
+        expected_filtered_dumpfile = PurePath(self.DUMPFILE_DIRECTORY, 'expected_existing_node_excluded_empty_revs_message')
+        opt = self.OPTIONS()
+
+        opt.drop_empty = False
+        opt.renumber_revs = False
+        opt.empty_rev_message = "This is an empty revision for padding."
+        with NamedTemporaryFile() as filtered_output_file:
+            parse_dump(input_dumpfile, filtered_output_file.name, ['python/trunk/Doc/README'], False, opt)
+            diff = self.filtered_dumpfile_differences(expected_filtered_dumpfile, filtered_output_file.name)
         self.assertEqual(b'', diff)

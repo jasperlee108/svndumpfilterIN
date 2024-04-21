@@ -98,6 +98,8 @@ necessary.
   Example: For the property header, a key, `K 23` as `svndumpfilter generated`, is appended with a value, `V 4`
   as `True`.
 
+11. A custom log message can be added when exclusions remove all nodes from a revision making the revision
+    empty. If this option, `--empty-rev-message` is used, only the date and log properties will remain.
 
 ## Contributing / Issues ##
 
@@ -154,7 +156,7 @@ PRs are also welcome to the problems you encounter.
 
    4. Ensure no security issues have been introduced using Bandit:
 
-          % bandit --ini tox.ini --exclude ./venv -r 
+          % bandit --ini tox.ini --exclude ./venv -r .
 
 ### <u>GitHub actions:</u> ###
 
