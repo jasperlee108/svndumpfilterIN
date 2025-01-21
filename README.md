@@ -27,7 +27,7 @@ target directory.
 
 Example Usage:
 
-    sudo python3 svndumpfilter.py input_name.dump include directory_name -r repo_path -o output_name.dump
+    sudo python3 svndumpfilter.py input_name.dump -r repo_path -o output_name.dump include directory_name
 
 Runs the svndumpfilter on `input_name.dump` from `repo_path` to carve out `directory_name`
 and save the result to `output_name.dump`.
