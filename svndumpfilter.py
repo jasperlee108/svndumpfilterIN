@@ -515,7 +515,7 @@ class MatchFiles(object):
                 verb = 'including'
             else:
                 verb = 'excluding'
-            print('Checking path {0} - {1} result'.format(path, verb))
+            print('Checking path {0} - {1} result'.format(path, verb).encode('utf-8'))
         if self.include:
             return result
         else:
